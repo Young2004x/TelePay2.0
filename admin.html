@@ -7,18 +7,25 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: sans-serif; background: #0f172a; color: #fff; padding: 20px; max-width: 850px; margin: 0 auto; }
+    body { font-family: sans-serif; background: #0b1329; color: #fff; padding: 20px; max-width: 850px; margin: 0 auto; }
     h1, h2 { color: #f59e0b; }
-    .card { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #334155; }
-    label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; color: #cbd5e1; }
-    input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 4px; font-size: 14px; }
+    .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
+    label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; color: #cbd5e1; }
+    input, select, textarea { width: 100%; padding: 12px; margin-top: 6px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px; font-size: 14px; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: #f59e0b; }
-    .row { display: flex; gap: 10px; }
+    .row { display: flex; gap: 12px; }
     .row > div { flex: 1; }
-    button { background: #f59e0b; color: #000; font-weight: bold; border: none; padding: 12px; margin-top: 15px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 15px; }
+    button { background: #f59e0b; color: #000; font-weight: bold; border: none; padding: 12px; margin-top: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; }
     button:hover { background: #d97706; }
     .btn-cancel { background: #475569; color: #fff; margin-top: 5px; }
-    .btn-cancel:hover { background: #334155; }
+    
+    /* Episode Builder Styles */
+    .ep-box { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-top: 10px; }
+    .ep-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+    .ep-row input { margin-top: 0; }
+    .btn-add-ep { background: #10b981; color: #fff; padding: 8px 12px; font-size: 13px; width: auto; margin-top: 10px; }
+    .btn-remove-ep { background: #ef4444; color: #fff; border: none; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
     th, td { padding: 10px; border-bottom: 1px solid #334155; text-align: left; }
     th { color: #f59e0b; }
@@ -29,12 +36,6 @@
     #msg { padding: 10px; margin-bottom: 15px; border-radius: 4px; display: none; font-weight: bold; }
     .success { background: #15803d; color: #fff; }
     .error { background: #b91c1c; color: #fff; }
-    
-    /* Series Episode Builder Styles */
-    .ep-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; background: #0f172a; padding: 8px; border-radius: 6px; border: 1px solid #334155; }
-    .ep-row input { margin-top: 0; }
-    .btn-add-ep { background: #10b981; color: #fff; padding: 8px 12px; font-size: 13px; width: auto; margin-top: 10px; }
-    .btn-remove-ep { background: #ef4444; color: #fff; border: none; padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -48,51 +49,51 @@
       <input type="hidden" id="movie-id">
       
       <label>Title *</label>
-      <input type="text" id="title" required placeholder="e.g. Flex X Cop">
+      <input type="text" id="title" required placeholder="e.g. Moana 2">
 
       <div class="row">
         <div>
           <label>Type *</label>
-          <select id="type">
+          <select id="item-type">
             <option value="Movie">Movie</option>
             <option value="Series">Series</option>
           </select>
         </div>
         <div>
           <label>Category (Genre) *</label>
-          <input type="text" id="category" required placeholder="e.g. Action, Drama">
+          <input type="text" id="category" required placeholder="e.g. Action, Animation">
         </div>
       </div>
 
       <div class="row">
         <div>
           <label>Quality</label>
-          <input type="text" id="quality" placeholder="e.g. 1080p, 720p" value="1080p">
+          <input type="text" id="quality" placeholder="1080p" value="1080p">
         </div>
         <div>
           <label>Rating ⭐</label>
-          <input type="text" id="rating" placeholder="e.g. 8.5" value="8.0">
+          <input type="text" id="rating" placeholder="8.0" value="8.0">
         </div>
       </div>
 
       <label>Poster Image URL *</label>
       <input type="url" id="poster_url" required placeholder="https://image.tmdb.org/t/p/w500/...">
 
-      <!-- Movie Single Link Field -->
+      <!-- Movie Single Link (Show only when Type = Movie) -->
       <div id="movie-link-section">
         <label>Telegram Stream/Download Link (Movie) *</label>
         <input type="url" id="telegram_link" placeholder="https://t.me/c/...">
       </div>
 
-      <!-- Series Episode List Builder -->
-      <div id="series-episodes-section" style="display: none; margin-top: 15px; border-top: 1px dashed #334155; padding-top: 10px;">
-        <label style="color: #f59e0b; font-size: 15px;">📺 Series Episodes List</label>
+      <!-- Series Episodes Section (Show only when Type = Series) -->
+      <div id="series-episodes-section" class="ep-box" style="display: none;">
+        <label style="color: #f59e0b; margin:0;">📺 Series Episodes List</label>
         <div id="episodes-container"></div>
-        <button type="button" id="add-ep-btn" class="btn-add-ep">+ Add Episode</button>
+        <button type="button" id="btn-add-ep" class="btn-add-ep">+ Add Episode</button>
       </div>
 
-      <label style="margin-top: 15px;">Description / Storyline</label>
-      <textarea id="description" rows="3" placeholder="Enter storyline..."></textarea>
+      <label>Description / Storyline</label>
+      <textarea id="description" rows="3" placeholder="Enter movie or series description..."></textarea>
 
       <button type="submit" id="btn-submit">Save Item</button>
       <button type="button" id="btn-cancel" class="btn-cancel" style="display:none;">Cancel Edit</button>
@@ -126,40 +127,37 @@
 
     let moviesList = [];
 
-    // Episode Row ထည့်ပေးသည့် Function
+    // Episode Row တစ်ခုချင်းစီ ထည့်ပေးသည့် Function
     function addEpisodeRow(name = '', link = '') {
       const container = document.getElementById('episodes-container');
       const div = document.createElement('div');
       div.className = 'ep-row';
       div.innerHTML = `
-        <input type="text" placeholder="Ep Name (e.g. S1 E01)" value="${name}" style="width: 30%;" class="ep-name">
-        <input type="url" placeholder="Telegram Link" value="${link}" style="width: 60%;" class="ep-link">
+        <input type="text" placeholder="Ep Name (e.g. S1 E01)" value="${name}" style="width: 35%;" class="ep-name">
+        <input type="url" placeholder="Telegram Link" value="${link}" style="width: 55%;" class="ep-link">
         <button type="button" class="btn-remove-ep">✕</button>
       `;
       
-      div.querySelector('.btn-remove-ep').addEventListener('click', function() {
-        div.remove();
-      });
-
+      div.querySelector('.btn-remove-ep').addEventListener('click', () => div.remove());
       container.appendChild(div);
     }
 
-    // Type ကို Series/Movie ပြောင်းလဲမှုကို ကြည့်ပေးသည့် Function
-    function toggleTypeFields() {
-      const type = document.getElementById('type').value;
-      const movieSection = document.getElementById('movie-link-section');
-      const seriesSection = document.getElementById('series-episodes-section');
+    // Select Box ကို Series / Movie ချိန်းလိုက်ရင် အလုပ်လုပ်မည့် Function
+    function checkTypeChange() {
+      const type = document.getElementById('item-type').value;
+      const movieSec = document.getElementById('movie-link-section');
+      const seriesSec = document.getElementById('series-episodes-section');
       const container = document.getElementById('episodes-container');
 
       if (type === 'Series') {
-        movieSection.style.display = 'none';
-        seriesSection.style.display = 'block';
+        movieSec.style.display = 'none';
+        seriesSec.style.display = 'block';
         if (container.children.length === 0) {
           addEpisodeRow('S1 E01', '');
         }
       } else {
-        movieSection.style.display = 'block';
-        seriesSection.style.display = 'none';
+        movieSec.style.display = 'block';
+        seriesSec.style.display = 'none';
       }
     }
 
@@ -169,9 +167,7 @@
       rows.forEach(r => {
         const name = r.querySelector('.ep-name').value.trim();
         const link = r.querySelector('.ep-link').value.trim();
-        if (name && link) {
-          list.push({ title: name, link: link });
-        }
+        if (name && link) list.push({ title: name, link: link });
       });
       return list;
     }
@@ -222,7 +218,7 @@
     document.getElementById('movie-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('movie-id').value;
-      const type = document.getElementById('type').value;
+      const type = document.getElementById('item-type').value;
 
       const payload = {
         title: document.getElementById('title').value,
@@ -255,7 +251,7 @@
       if (!m) return;
       document.getElementById('movie-id').value = m.id;
       document.getElementById('title').value = m.title || '';
-      document.getElementById('type').value = m.type || 'Movie';
+      document.getElementById('item-type').value = m.type || 'Movie';
       document.getElementById('category').value = m.category || '';
       document.getElementById('quality').value = m.quality || '1080p';
       document.getElementById('rating').value = m.rating || '8.0';
@@ -269,7 +265,7 @@
         m.episodes.forEach(ep => addEpisodeRow(ep.title, ep.link));
       }
 
-      toggleTypeFields();
+      checkTypeChange();
 
       document.getElementById('form-title').innerText = '✏️ Edit Item ID: ' + m.id;
       document.getElementById('btn-submit').innerText = 'Update Item';
@@ -291,17 +287,17 @@
       document.getElementById('movie-form').reset();
       document.getElementById('movie-id').value = '';
       document.getElementById('episodes-container').innerHTML = '';
-      toggleTypeFields();
+      checkTypeChange();
       document.getElementById('form-title').innerText = '➕ Add New Item';
       document.getElementById('btn-submit').innerText = 'Save Item';
       document.getElementById('btn-cancel').style.display = 'none';
     }
 
-    // Event Listener များ ချိတ်ဆက်ခြင်း
+    // Event Listeners (ခလုတ်နှိပ်ခြင်း/ပြောင်းလဲခြင်းများကို နားထောင်ပေးခြင်း)
     document.addEventListener('DOMContentLoaded', () => {
       fetchMovies();
-      document.getElementById('type').addEventListener('change', toggleTypeFields);
-      document.getElementById('add-ep-btn').addEventListener('click', () => addEpisodeRow());
+      document.getElementById('item-type').addEventListener('change', checkTypeChange);
+      document.getElementById('btn-add-ep').addEventListener('click', () => addEpisodeRow());
       document.getElementById('btn-cancel').addEventListener('click', resetForm);
     });
   </script>
