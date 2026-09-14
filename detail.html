@@ -3,120 +3,165 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Movie Details - TelePlay</title>
+  <title>TelePlay - Details</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     * { box-sizing: border-box; }
     body { font-family: sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 15px; }
-    .container { max-width: 700px; margin: 0 auto; }
+
+    .header-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .back-btn { text-decoration: none; color: #f59e0b; font-size: 14px; font-weight: bold; background: #1e293b; padding: 6px 14px; border-radius: 6px; border: 1px solid #334155; }
     
-    .back-btn {
-      display: inline-block; background: #1e293b; color: #f59e0b;
-      padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold;
-      cursor: pointer; text-decoration: none; margin-bottom: 20px; border: 1px solid #334155;
+    .detail-container { max-width: 800px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 16px; border: 1px solid #334155; }
+    
+    .main-info { display: flex; gap: 16px; flex-direction: column; }
+    
+    @media (min-width: 600px) {
+      .main-info { flex-direction: row; }
+      .poster-wrap { width: 220px; flex-shrink: 0; }
     }
+
+    .poster-wrap { position: relative; width: 100%; aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; background: #0f172a; }
+    .poster-wrap img { width: 100%; height: 100%; object-fit: cover; }
     
-    .detail-card { background: #1e293b; border-radius: 10px; overflow: hidden; padding: 15px; border: 1px solid #334155; }
+    .badge-q { position: absolute; top: 8px; right: 8px; background: #f59e0b; color: #000; font-weight: bold; font-size: 10px; padding: 3px 6px; border-radius: 4px; }
+    .badge-r { position: absolute; top: 8px; left: 8px; background: rgba(15, 23, 42, 0.9); color: #f59e0b; font-weight: bold; font-size: 10px; padding: 3px 6px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+    .info-wrap { flex-grow: 1; display: flex; flex-direction: column; }
+    .movie-title { font-size: 22px; font-weight: bold; color: #fff; margin: 0 0 8px 0; }
     
-    .poster-container { text-align: center; margin-bottom: 15px; }
-    .poster-container img { max-width: 100%; max-height: 350px; border-radius: 8px; object-fit: cover; }
+    .meta-tags { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tag { background: #0f172a; border: 1px solid #334155; color: #94a3b8; font-size: 11px; padding: 4px 8px; border-radius: 4px; }
     
-    .movie-title { font-size: 22px; font-weight: bold; color: #f59e0b; margin-bottom: 8px; }
-    .badge { display: inline-block; background: #f59e0b; color: #000; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-right: 6px; text-transform: uppercase; }
-    .category { font-size: 13px; color: #94a3b8; margin-bottom: 15px; }
+    .desc-title { font-size: 14px; font-weight: bold; color: #f59e0b; margin-top: 10px; }
+    .desc-text { font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-top: 5px; }
+
+    /* Single Movie Button */
+    .btn-watch-main { display: block; background: #f59e0b; color: #000; text-align: center; text-decoration: none; font-weight: bold; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 15px; }
+    .btn-watch-main:hover { background: #d97706; }
+
+    /* Series Episode Section */
+    .episodes-section { margin-top: 25px; border-top: 1px solid #334155; padding-top: 15px; }
+    .episodes-title { font-size: 16px; font-weight: bold; color: #f59e0b; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
     
-    .desc-box { background: #0f172a; padding: 12px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #334155; font-size: 13px; line-height: 1.6; color: #cbd5e1; white-space: pre-wrap; }
-    
-    .download-btn {
-      display: block; text-align: center; background: #22c55e; color: #fff;
-      font-weight: bold; padding: 12px; border-radius: 6px; text-decoration: none;
-      font-size: 15px; transition: background 0.2s;
-    }
-    .download-btn:hover { background: #16a34a; }
-    
-    #status { text-align: center; margin-top: 50px; color: #f59e0b; font-size: 16px; }
+    .episodes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .ep-card { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px; text-decoration: none; color: #fff; text-align: center; font-size: 13px; font-weight: bold; transition: all 0.2s; }
+    .ep-card:hover { border-color: #f59e0b; color: #f59e0b; transform: translateY(-2px); }
+
+    #loading { text-align: center; padding: 50px; color: #f59e0b; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <a href="index.html" class="back-btn">← Back to Home</a>
-    
-    <div id="status">Loading movie details...</div>
-    
-    <div id="movie-detail" class="detail-card" style="display: none;">
-      <div class="poster-container">
-        <img id="poster" src="" alt="Movie Poster">
+  <div class="header-nav">
+    <a href="index.html" class="back-btn">← Back</a>
+  </div>
+
+  <div id="loading">Loading details...</div>
+
+  <div id="content" class="detail-container" style="display: none;">
+    <div class="main-info">
+      <div class="poster-wrap">
+        <img id="poster" src="" alt="Poster">
+        <div class="badge-q" id="quality">1080p</div>
+        <div class="badge-r" id="rating">⭐ 8.0</div>
       </div>
-      
-      <div class="movie-title" id="title"></div>
-      
-      <div class="category">
-        <span class="badge" id="quality"></span>
-        <span id="type-cat"></span>
+      <div class="info-wrap">
+        <h1 class="movie-title" id="title">Movie Title</h1>
+        
+        <div class="meta-tags">
+          <span class="tag" id="type-tag">Movie</span>
+          <span class="tag" id="category-tag">Action</span>
+        </div>
+
+        <div class="desc-title">Storyline</div>
+        <div class="desc-text" id="description">No description available.</div>
+
+        <!-- Movie Single Link Button -->
+        <a id="movie-watch-btn" href="#" target="_blank" class="btn-watch-main" style="display: none;">▶ Stream / Download Movie</a>
       </div>
-      
-      <h3>Description (ဇာတ်လမ်းအညွှန်း)</h3>
-      <div class="desc-box" id="description">အညွှန်းမရှိပါ။</div>
-      
-      <a id="telegram-link" href="#" target="_blank" class="download-btn">🚀 Watch on Telegram (ကြည့်ရှုရန်)</a>
+    </div>
+
+    <!-- Series Episodes Grid -->
+    <div id="series-episodes-block" class="episodes-section" style="display: none;">
+      <div class="episodes-title">
+        <span>📺 Select Episode</span>
+        <span style="font-size: 12px; color: #94a3b8;" id="ep-count">0 Episodes</span>
+      </div>
+      <div class="episodes-grid" id="episodes-grid"></div>
     </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://boiqvzakfztlujjdiyhm.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_9nHwP9SRRzgpxxslQ-gB6w_hT2Y-noa';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function loadMovieDetail() {
-      const statusDiv = document.getElementById('status');
-      const detailDiv = document.getElementById('movie-detail');
+    const DEFAULT_POSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="240" viewBox="0 0 160 240"><rect width="100%" height="100%" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="14">No Image</text></svg>';
 
-      // URL ထဲမှ movie id ကို ယူခြင်း
-      const urlParams = new URLSearchParams(window.location.search);
-      const movieId = urlParams.get('id');
+    async function loadDetail() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
 
-      if (!movieId) {
-        statusDiv.innerText = '❌ ဇာတ်ကား ID မတွေ့ရှိပါ။';
+      if (!id) {
+        document.getElementById('loading').innerText = '❌ Invalid Movie ID!';
         return;
       }
 
-      if (!window.supabase) {
-        statusDiv.innerText = '❌ Supabase SDK load မဖြစ်ပါ။';
+      const { data: m, error } = await sb.from('movies').select('*').eq('id', id).single();
+
+      if (error || !m) {
+        document.getElementById('loading').innerText = '❌ Item not found!';
         return;
       }
 
-      const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      const { data, error } = await sbClient.from('movies').select('*').eq('id', movieId).single();
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
 
-      if (error || !data) {
-        statusDiv.innerText = '❌ ဇာတ်ကား အချက်အလက် ရှာမတွေ့ပါ။';
-        return;
-      }
-
-      // UI တွင် အချက်အလက်များ ထည့်သွင်းခြင်း
-      document.getElementById('poster').src = data.poster_url || '';
-      document.getElementById('title').innerText = data.title || 'Untitled';
-      document.getElementById('quality').innerText = data.quality || '1080p';
-      document.getElementById('type-cat').innerText = (data.type || 'Movie') + ' • ' + (data.category || 'General');
+      document.title = m.title + ' - TelePlay';
+      document.getElementById('title').innerText = m.title || 'Untitled';
+      document.getElementById('poster').src = m.poster_url || DEFAULT_POSTER;
+      document.getElementById('poster').onerror = function() { this.src = DEFAULT_POSTER; };
       
-      // Description ပြသခြင်း
-      if (data.description && data.description.trim() !== '') {
-        document.getElementById('description').innerText = data.description;
-      }
+      document.getElementById('quality').innerText = m.quality || '1080p';
+      document.getElementById('rating').innerText = '⭐ ' + (m.rating || 'N/A');
+      document.getElementById('type-tag').innerText = m.type || 'Movie';
+      document.getElementById('category-tag').innerText = m.category || 'General';
+      document.getElementById('description').innerText = m.description || 'No description provided.';
 
-      // Telegram Link ချိတ်ပေးခြင်း
-      const tgBtn = document.getElementById('telegram-link');
-      if (data.telegram_link) {
-        tgBtn.href = data.telegram_link;
+      if (m.type === 'Series') {
+        // Show Series Episodes Grid
+        const epBlock = document.getElementById('series-episodes-block');
+        const epGrid = document.getElementById('episodes-grid');
+        const epCount = document.getElementById('ep-count');
+        
+        epBlock.style.display = 'block';
+        epGrid.innerHTML = '';
+
+        const episodes = m.episodes || [];
+        epCount.innerText = episodes.length + ' Episodes';
+
+        if (episodes.length === 0) {
+          epGrid.innerHTML = '<div style="grid-column: 1/-1; color: #94a3b8;">No episodes uploaded yet.</div>';
+        } else {
+          episodes.forEach(ep => {
+            const btn = document.createElement('a');
+            btn.className = 'ep-card';
+            btn.href = ep.link;
+            btn.target = '_blank';
+            btn.innerText = ep.title;
+            epGrid.appendChild(btn);
+          });
+        }
       } else {
-        tgBtn.style.display = 'none';
+        // Show Movie Watch Button
+        const watchBtn = document.getElementById('movie-watch-btn');
+        watchBtn.style.display = 'block';
+        watchBtn.href = m.telegram_link || '#';
       }
-
-      statusDiv.style.display = 'none';
-      detailDiv.style.display = 'block';
     }
 
-    window.addEventListener('DOMContentLoaded', loadMovieDetail);
+    window.addEventListener('DOMContentLoaded', loadDetail);
   </script>
 </body>
 </html>
