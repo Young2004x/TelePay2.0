@@ -3,49 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TelePlay - Admin Panel</title>
+  <title>TelePlay Admin Panel</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: sans-serif; background: #0b1329; color: #fff; padding: 20px; max-width: 850px; margin: 0 auto; }
-    h1, h2 { color: #f59e0b; }
-    .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
-    label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; color: #cbd5e1; }
-    input, select, textarea { width: 100%; padding: 12px; margin-top: 6px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px; font-size: 14px; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #fff; padding: 20px; max-width: 800px; margin: 0 auto; }
+    h1 { color: #f59e0b; font-size: 24px; margin-bottom: 20px; }
+    .card { background: #1e293b; padding: 24px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
+    h2 { color: #f59e0b; font-size: 18px; margin-top: 0; margin-bottom: 16px; }
+    label { display: block; margin-top: 12px; font-weight: bold; font-size: 13px; color: #cbd5e1; }
+    input, select, textarea { width: 100%; padding: 10px; margin-top: 6px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px; font-size: 14px; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: #f59e0b; }
     .row { display: flex; gap: 12px; }
     .row > div { flex: 1; }
-    
-    /* Type Selection Radio Styles */
-    .type-selector { display: flex; gap: 15px; margin-top: 8px; }
-    .type-option { flex: 1; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px; text-align: center; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .type-option input { width: auto; margin: 0; }
 
-    /* Pure CSS Switcher */
+    /* Movie / Series Link Sections */
     #movie-link-section { display: block; }
-    #series-episodes-section { display: none; }
-
-    /* Episode Builder Styles */
-    .ep-box { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-top: 15px; }
+    #series-episodes-section { display: none; background: #0f172a; padding: 16px; border-radius: 8px; border: 1px dashed #334155; margin-top: 16px; }
+    
     .ep-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
     .ep-row input { margin-top: 0; }
-    .btn-add-ep { background: #10b981; color: #fff; padding: 8px 12px; font-size: 13px; width: auto; margin-top: 10px; }
-    .btn-remove-ep { background: #ef4444; color: #fff; border: none; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .btn-add-ep { background: #10b981; color: #fff; border: none; padding: 8px 12px; font-size: 13px; border-radius: 6px; cursor: pointer; width: auto; margin-top: 10px; font-weight: bold; }
+    .btn-remove-ep { background: #ef4444; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
 
-    button { background: #f59e0b; color: #000; font-weight: bold; border: none; padding: 12px; margin-top: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; }
-    button:hover { background: #d97706; }
-    .btn-cancel { background: #475569; color: #fff; margin-top: 5px; }
+    button[type="submit"] { background: #f59e0b; color: #000; font-weight: bold; border: none; padding: 12px; margin-top: 20px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; }
+    button[type="submit"]:hover { background: #d97706; }
+    .btn-cancel { background: #475569; color: #fff; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 8px; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
     th, td { padding: 10px; border-bottom: 1px solid #334155; text-align: left; }
     th { color: #f59e0b; }
-    .action-btn { padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; }
+    .action-btn { padding: 4px 8px; font-size: 12px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; margin-right: 4px; }
     .btn-edit { background: #3b82f6; color: #fff; }
     .btn-delete { background: #ef4444; color: #fff; }
-    .poster-preview { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; }
-    #msg { padding: 10px; margin-bottom: 15px; border-radius: 4px; display: none; font-weight: bold; }
-    .success { background: #15803d; color: #fff; }
-    .error { background: #b91c1c; color: #fff; }
+    .poster-preview { width: 40px; height: 55px; object-fit: cover; border-radius: 4px; }
+    #msg { padding: 10px; margin-bottom: 15px; border-radius: 6px; display: none; font-weight: bold; }
+    .success { background: #166534; color: #fff; }
+    .error { background: #991b1b; color: #fff; }
   </style>
 </head>
 <body>
@@ -54,24 +48,20 @@
   <div id="msg"></div>
 
   <div class="card">
-    <h2 id="form-title">➕ Add New Item</h2>
+    <h2 id="form-title">➕ Add New Movie/Series</h2>
     <form id="movie-form">
       <input type="hidden" id="movie-id">
       
-      <label>Title *</label>
-      <input type="text" id="title" required placeholder="e.g. Moana 2 / Flex X Cop">
+      <label>Movie/Series Title *</label>
+      <input type="text" id="title" required placeholder="e.g. Moana 2">
 
       <div class="row">
         <div>
           <label>Type *</label>
-          <div class="type-selector">
-            <label class="type-option">
-              <input type="radio" name="item_type" value="Movie" checked onchange="switchType('Movie')"> 🎬 Movie
-            </label>
-            <label class="type-option">
-              <input type="radio" name="item_type" value="Series" onchange="switchType('Series')"> 📺 Series
-            </label>
-          </div>
+          <select id="type" required>
+            <option value="Movie">Movie</option>
+            <option value="Series">Series</option>
+          </select>
         </div>
         <div>
           <label>Category (Genre) *</label>
@@ -93,23 +83,23 @@
       <label>Poster Image URL *</label>
       <input type="url" id="poster_url" required placeholder="https://image.tmdb.org/t/p/w500/...">
 
-      <!-- Movie Single Link Section -->
+      <!-- Movie Link Section -->
       <div id="movie-link-section">
-        <label>Telegram Stream/Download Link (Movie) *</label>
+        <label>Telegram Stream/Download Link *</label>
         <input type="url" id="telegram_link" placeholder="https://t.me/c/...">
       </div>
 
       <!-- Series Episodes Section -->
-      <div id="series-episodes-section" class="ep-box">
-        <label style="color: #f59e0b; margin:0;">📺 Series Episodes List</label>
+      <div id="series-episodes-section">
+        <label style="color: #f59e0b; margin-top: 0;">📺 Series Episodes List</label>
         <div id="episodes-container"></div>
         <button type="button" onclick="addEpisodeRow()" class="btn-add-ep">+ Add Episode</button>
       </div>
 
-      <label style="margin-top: 15px;">Description / Storyline</label>
-      <textarea id="description" rows="3" placeholder="Enter storyline..."></textarea>
+      <label>Description / Storyline</label>
+      <textarea id="description" rows="3" placeholder="Enter movie description..."></textarea>
 
-      <button type="submit" id="btn-submit">Save Item</button>
+      <button type="submit" id="btn-submit">Save Movie</button>
       <button type="button" id="btn-cancel" class="btn-cancel" style="display:none;" onclick="resetForm()">Cancel Edit</button>
     </form>
   </div>
@@ -141,16 +131,24 @@
 
     let moviesList = [];
 
-    // Switch between Movie & Series UI
-    function switchType(type) {
+    // Setup Type Change Event Listener
+    document.addEventListener('DOMContentLoaded', () => {
+      const typeSelect = document.getElementById('type');
+      typeSelect.addEventListener('change', handleTypeChange);
+      fetchMovies();
+    });
+
+    function handleTypeChange() {
+      const selectedType = document.getElementById('type').value;
       const movieSec = document.getElementById('movie-link-section');
       const seriesSec = document.getElementById('series-episodes-section');
-      const container = document.getElementById('episodes-container');
+      const epContainer = document.getElementById('episodes-container');
 
-      if (type === 'Series') {
+      if (selectedType === 'Series') {
         movieSec.style.display = 'none';
         seriesSec.style.display = 'block';
-        if (container.children.length === 0) {
+
+        if (epContainer.children.length === 0) {
           addEpisodeRow('S1 E01', '');
         }
       } else {
@@ -159,7 +157,6 @@
       }
     }
 
-    // Add new Episode Row
     function addEpisodeRow(name = '', link = '') {
       const container = document.getElementById('episodes-container');
       const div = document.createElement('div');
@@ -170,14 +167,6 @@
         <button type="button" class="btn-remove-ep" onclick="this.parentElement.remove()">✕</button>
       `;
       container.appendChild(div);
-    }
-
-    function getSelectedType() {
-      const radios = document.getElementsByName('item_type');
-      for (let r of radios) {
-        if (r.checked) return r.value;
-      }
-      return 'Movie';
     }
 
     function getEpisodesData() {
@@ -221,7 +210,7 @@
       moviesList.forEach(m => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><img src="${m.poster_url || ''}" class="poster-preview" onerror="this.src='https://via.placeholder.com/40x60'"></td>
+          <td><img src="${m.poster_url || ''}" class="poster-preview" onerror="this.src='https://via.placeholder.com/40x55'"></td>
           <td><strong>${m.title}</strong><br><small style="color:#94a3b8">${m.category || ''}</small></td>
           <td>${m.type || 'Movie'}</td>
           <td>⭐ ${m.rating || 'N/A'}</td>
@@ -237,7 +226,7 @@
     document.getElementById('movie-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('movie-id').value;
-      const type = getSelectedType();
+      const type = document.getElementById('type').value;
 
       const payload = {
         title: document.getElementById('title').value,
@@ -270,13 +259,7 @@
       if (!m) return;
       document.getElementById('movie-id').value = m.id;
       document.getElementById('title').value = m.title || '';
-      
-      const type = m.type || 'Movie';
-      const radios = document.getElementsByName('item_type');
-      for (let r of radios) {
-        r.checked = (r.value === type);
-      }
-
+      document.getElementById('type').value = m.type || 'Movie';
       document.getElementById('category').value = m.category || '';
       document.getElementById('quality').value = m.quality || '1080p';
       document.getElementById('rating').value = m.rating || '8.0';
@@ -286,11 +269,11 @@
 
       const container = document.getElementById('episodes-container');
       container.innerHTML = '';
-      if (type === 'Series' && m.episodes && m.episodes.length > 0) {
+      if (m.type === 'Series' && m.episodes && m.episodes.length > 0) {
         m.episodes.forEach(ep => addEpisodeRow(ep.title, ep.link));
       }
 
-      switchType(type);
+      handleTypeChange();
 
       document.getElementById('form-title').innerText = '✏️ Edit Item ID: ' + m.id;
       document.getElementById('btn-submit').innerText = 'Update Item';
@@ -312,15 +295,12 @@
       document.getElementById('movie-form').reset();
       document.getElementById('movie-id').value = '';
       document.getElementById('episodes-container').innerHTML = '';
-      const radios = document.getElementsByName('item_type');
-      if (radios.length > 0) radios[0].checked = true;
-      switchType('Movie');
-      document.getElementById('form-title').innerText = '➕ Add New Item';
-      document.getElementById('btn-submit').innerText = 'Save Item';
+      document.getElementById('type').value = 'Movie';
+      handleTypeChange();
+      document.getElementById('form-title').innerText = '➕ Add New Movie/Series';
+      document.getElementById('btn-submit').innerText = 'Save Movie';
       document.getElementById('btn-cancel').style.display = 'none';
     }
-
-    window.addEventListener('DOMContentLoaded', fetchMovies);
   </script>
 </body>
 </html>
