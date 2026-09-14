@@ -3,550 +3,292 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TelePlay - Home</title>
+  <title>TelePlay - Stream & Watch</title>
+  <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 12px; }
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #f59e0b;
+      --text-color: #f8fafc;
+      --text-sub: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 70px; }
+
+    /* Header & Search */
+    header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #0b1120; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1e293b; }
+    .logo { font-size: 22px; font-weight: 800; color: var(--accent-color); text-decoration: none; }
+    .search-box { position: relative; width: 50%; max-width: 300px; }
+    .search-box input { width: 100%; padding: 8px 12px 8px 36px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; color: #fff; font-size: 13px; }
+    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-sub); }
+
+    /* Container */
+    .container { padding: 16px; max-width: 1200px; margin: 0 auto; }
+
+    /* Featured Carousel / Hero Banner */
+    .featured-section { margin-bottom: 24px; }
+    .hero-banner { width: 100%; height: 220px; border-radius: 12px; background-size: cover; background-position: center; position: relative; display: flex; align-items: flex-end; padding: 16px; box-shadow: inset 0 -100px 80px rgba(0,0,0,0.8); }
+    .hero-content h2 { font-size: 20px; color: #fff; margin-bottom: 4px; }
+    .hero-content p { font-size: 12px; color: var(--text-sub); margin-bottom: 8px; }
+
+    /* Category / Genre Pills */
+    .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 20px; scrollbar-width: none; }
+    .categories-bar::-webkit-scrollbar { display: none; }
+    .cat-pill { padding: 6px 16px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; font-size: 13px; color: var(--text-sub); cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .cat-pill.active, .cat-pill:hover { background: var(--accent-color); color: #000; font-weight: bold; border-color: var(--accent-color); }
+
+    /* Movie Grid */
+    .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+    .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 14px; margin-bottom: 24px; }
     
-    header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 20px; 
-      flex-wrap: wrap; 
-      gap: 10px;
-    }
-    h1 { color: #f59e0b; margin: 0; font-size: 22px; cursor: pointer; }
+    .movie-card { background: var(--card-bg); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; border: 1px solid #334155; }
+    .movie-card:hover { transform: translateY(-4px); }
+    .poster-wrapper { position: relative; aspect-ratio: 2/3; width: 100%; background: #1e293b; }
+    .poster-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+    .badge-type { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: var(--accent-color); backdrop-filter: blur(4px); }
+    .badge-rating { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: #f59e0b; backdrop-filter: blur(4px); }
     
-    .search-box {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .search-box input {
-      background: #1e293b;
-      border: 1px solid #334155;
-      padding: 6px 10px 6px 28px;
-      border-radius: 20px;
-      color: #fff;
-      font-size: 12px;
-      outline: none;
-      transition: all 0.2s;
-      width: 150px;
-    }
-    .search-box input:focus {
-      border-color: #f59e0b;
-      width: 180px;
-    }
-    .search-icon {
-      position: absolute;
-      left: 8px;
-      color: #94a3b8;
-      font-size: 12px;
-    }
+    .movie-info { padding: 8px; }
+    .movie-title { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .movie-meta { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
 
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 25px;
-      margin-bottom: 12px;
-    }
+    /* Modal / Pop-up Window */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 200; padding: 16px; }
+    .modal-content { background: var(--card-bg); width: 100%; max-width: 500px; max-height: 90vh; border-radius: 12px; overflow-y: auto; border: 1px solid #334155; position: relative; }
+    .close-modal { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.5); color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 10; font-size: 16px; }
     
-    .title-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .section-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: #f8fafc;
-      border-left: 3px solid #f59e0b;
-      padding-left: 8px;
-    }
+    .modal-hero { width: 100%; height: 200px; background-size: cover; background-position: center; position: relative; }
+    .modal-body { padding: 16px; }
+    .modal-title { font-size: 18px; font-weight:bold; margin-bottom: 6px; }
+    .modal-genres { font-size: 12px; color: var(--accent-color); margin-bottom: 10px; }
+    .modal-desc { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin-bottom: 16px; }
 
-    /* Category Count Badge */
-    .count-badge {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #94a3b8;
-      font-size: 11px;
-      font-weight: bold;
-      padding: 2px 8px;
-      border-radius: 12px;
-      display: inline-block;
-    }
+    /* Episode Selector for Series */
+    .episodes-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .ep-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px 14px; border-radius: 6px; text-decoration: none; color: #fff; border: 1px solid #334155; font-size: 13px; }
+    .ep-item:hover { border-color: var(--accent-color); color: var(--accent-color); }
+    .btn-watch { display: block; width: 100%; text-align: center; background: var(--accent-color); color: #000; padding: 12px; border-radius: 6px; font-weight: bold; text-decoration: none; margin-top: 10px; }
 
-    .view-all-btn {
-      color: #f59e0b;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .view-all-btn:hover {
-      text-decoration: underline;
-    }
+    /* Bottom Navigation Bar (Mobile View) */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0b1120; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; font-size: 10px; gap: 4px; cursor: pointer; }
+    .nav-item.active, .nav-item:hover { color: var(--accent-color); }
+    .nav-item i { font-size: 16px; }
 
-    .back-btn {
-      display: inline-block;
-      background: #1e293b;
-      color: #f59e0b;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 15px;
-      border: 1px solid #334155;
-    }
-
-    /* Mobile First Grid */
-    .grid { 
-      display: grid; 
-      grid-template-columns: repeat(3, 1fr); 
-      gap: 10px; 
-    }
-
-    /* Desktop Responsive Layout */
     @media (min-width: 768px) {
-      body { padding: 20px 40px; max-width: 1300px; margin: 0 auto; }
-      h1 { font-size: 26px; }
-      .grid { 
-        grid-template-columns: repeat(5, 1fr); 
-        gap: 16px; 
-      }
-      .search-box input { width: 220px; font-size: 13px; padding: 8px 12px 8px 32px; }
-      .search-box input:focus { width: 260px; }
-      .search-icon { left: 10px; font-size: 14px; }
-      .section-title { font-size: 18px; }
-      .count-badge { font-size: 12px; padding: 2px 10px; }
-      .view-all-btn { font-size: 13px; }
-    }
-
-    @media (min-width: 1100px) {
-      .grid { 
-        grid-template-columns: repeat(6, 1fr); 
-      }
-    }
-
-    .card { 
-      background: #1e293b; 
-      border-radius: 8px; 
-      overflow: hidden; 
-      text-decoration: none; 
-      color: #fff; 
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.2s, box-shadow 0.2s; 
-      border: 1px solid #334155;
-    }
-    .card:hover { 
-      transform: translateY(-4px); 
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
-    
-    /* Movie Poster Frame (2:3 Aspect Ratio) */
-    .poster-box { 
-      position: relative; 
-      width: 100%; 
-      aspect-ratio: 2 / 3; 
-      background: #0f172a; 
-      overflow: hidden;
-    }
-    .poster-box img { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-      display: block;
-    }
-    
-    /* Quality Badge (Right Top) */
-    .badge-quality {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      background: rgba(245, 158, 11, 0.95);
-      color: #000;
-      font-size: 9px;
-      font-weight: bold;
-      padding: 2px 5px;
-      border-radius: 3px;
-      text-transform: uppercase;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    /* Rating Badge (Left Top) */
-    .badge-rating {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      background: rgba(15, 23, 42, 0.85);
-      color: #f59e0b;
-      font-size: 9px;
-      font-weight: bold;
-      padding: 2px 5px;
-      border-radius: 3px;
-      backdrop-filter: blur(2px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .card-info { padding: 8px 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-    .card-title { font-weight: bold; font-size: 12px; margin-bottom: 2px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-cat { font-size: 10px; color: #94a3b8; }
-    
-    @media (min-width: 768px) {
-      .card-info { padding: 10px; }
-      .card-title { font-size: 14px; margin-bottom: 4px; }
-      .card-cat { font-size: 11px; }
-      .badge-quality, .badge-rating { font-size: 10px; top: 8px; padding: 3px 6px; }
-      .badge-quality { right: 8px; }
-      .badge-rating { left: 8px; }
-    }
-
-    #status { text-align: center; padding: 40px; color: #f59e0b; font-size: 15px; }
-
-    /* Footer Design */
-    footer {
-      margin-top: 50px;
-      padding: 30px 15px 20px;
-      background: #090d16;
-      border-top: 1px solid #1e293b;
-      text-align: center;
-      color: #94a3b8;
-      font-size: 13px;
-      border-radius: 12px 12px 0 0;
-    }
-
-    .footer-brand {
-      font-size: 22px;
-      font-weight: 800;
-      color: #f59e0b;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-    }
-
-    .footer-credit-text {
-      font-size: 13px;
-      color: #cbd5e1;
-      margin-bottom: 6px;
-      line-height: 1.5;
-    }
-
-    .footer-disclaimer {
-      font-size: 11px;
-      color: #64748b;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-
-    .footer-pills {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .pill {
-      display: inline-block;
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #cbd5e1;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-    }
-
-    .pill-amber {
-      border-color: #f59e0b;
-      color: #f59e0b;
-    }
-
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #1e293b;
-      padding-top: 15px;
-      margin-top: 20px;
-      font-size: 12px;
-      color: #64748b;
-    }
-
-    .back-to-top {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #f59e0b;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-      transition: all 0.2s;
-    }
-
-    .back-to-top:hover {
-      background: #f59e0b;
-      color: #000;
+      .hero-banner { height: 320px; }
+      .bottom-nav { display: none; } /* PC View မှာ Bottom Nav ဖျောက်မည် */
+      body { padding-bottom: 0; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Header -->
   <header>
-    <h1 onclick="showHomeView()">TelePlay</h1>
+    <a href="#" class="logo">TELEPLAY</a>
     <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="Search movies..." onkeyup="filterMovies()">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="search-input" placeholder="Search title..." onkeyup="filterMovies()">
     </div>
   </header>
 
-  <div id="status">Loading updates...</div>
-
-  <div id="home-view" style="display: none;">
-    <!-- Latest Updates -->
-    <div class="section-header">
-      <div class="title-group">
-        <div class="section-title">Latest Updates</div>
-        <span class="count-badge" id="latest-count">0</span>
-      </div>
-      <span class="view-all-btn" onclick="showViewAll('latest')">View All ›</span>
-    </div>
-    <div id="latest-grid" class="grid"></div>
-
-    <!-- Movies -->
-    <div class="section-header">
-      <div class="title-group">
-        <div class="section-title">Movies</div>
-        <span class="count-badge" id="movies-count">0</span>
-      </div>
-      <span class="view-all-btn" onclick="showViewAll('movies')">View All ›</span>
-    </div>
-    <div id="movies-grid" class="grid"></div>
-
-    <!-- Series -->
-    <div class="section-header">
-      <div class="title-group">
-        <div class="section-title">Series</div>
-        <span class="count-badge" id="series-count">0</span>
-      </div>
-      <span class="view-all-btn" onclick="showViewAll('series')">View All ›</span>
-    </div>
-    <div id="series-grid" class="grid"></div>
-  </div>
-
-  <div id="view-all-page" style="display: none;">
-    <div class="back-btn" onclick="showHomeView()">← Back to Home</div>
-    <div class="section-header" style="margin-top: 0;">
-      <div class="title-group">
-        <div class="section-title" id="view-all-title">All Items</div>
-        <span class="count-badge" id="view-all-count">0</span>
-      </div>
-    </div>
-    <div id="view-all-grid" class="grid"></div>
-  </div>
-
-  <footer>
-    <div class="footer-brand">TELEPLAY</div>
+  <div class="container">
     
-    <div class="footer-credit-text">
-      မူရင်းဗီဒီယို ဖန်တီးသူများနှင့် ဘာသာပြန်အဖွဲ့များအားလုံးကို Full Credit ပေးပါသည်။
+    <!-- Hero Banner / Featured Movie -->
+    <div class="featured-section" id="hero-section">
+      <!-- JavaScript ဖြင့် Dynamic ထည့်ပေးမည် -->
+    </div>
+
+    <!-- Category / Genre Pills -->
+    <div class="categories-bar" id="category-bar">
+      <div class="cat-pill active" onclick="filterCategory('All')">All</div>
+      <div class="cat-pill" onclick="filterCategory('Action')">Action</div>
+      <div class="cat-pill" onclick="filterCategory('Drama')">Drama</div>
+      <div class="cat-pill" onclick="filterCategory('Comedy')">Comedy</div>
+      <div class="cat-pill" onclick="filterCategory('Romance')">Romance</div>
+      <div class="cat-pill" onclick="filterCategory('Sci-Fi')">Sci-Fi</div>
+    </div>
+
+    <!-- Movies Grid Section -->
+    <div class="section-title">
+      <span id="section-heading">All Movies & Series</span>
+      <small style="color: var(--text-sub); font-size: 12px;" id="item-count"></small>
     </div>
     
-    <div class="footer-disclaimer">
-      All streamed content is delivered via third-party services.<br>
-      No files are stored on our servers.
+    <div class="movie-grid" id="movie-grid">
+      <!-- Movies dynamic ရောက်လာမည် -->
     </div>
 
-    <div class="footer-pills">
-      <div class="pill pill-amber">Made by <strong>YoungX &amp; Claude AI</strong></div>
-      <div class="pill">Powered by <strong>Supabase</strong></div>
-    </div>
+  </div>
 
-    <div class="footer-pills">
-      <div class="pill">Platforms: <strong>Ysflix · Hdhub4u · AnimeXin · Bioscope · Homietv</strong></div>
+  <!-- Bottom Mobile Navigation -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="filterCategory('All')">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
     </div>
+    <div class="nav-item" onclick="filterType('Movie')">
+      <i class="fa-solid fa-film"></i>
+      <span>Movies</span>
+    </div>
+    <div class="nav-item" onclick="filterType('Series')">
+      <i class="fa-solid fa-tv"></i>
+      <span>Series</span>
+    </div>
+  </nav>
 
-    <div class="footer-bottom">
-      <div style="width: 36px;"></div>
-      <div>© 2026 TelePlay. All rights reserved.</div>
-      <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});" title="Back to Top">↑</button>
+  <!-- Movie Details Modal -->
+  <div class="modal-overlay" id="movie-modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()">✕</button>
+      <div class="modal-hero" id="modal-poster"></div>
+      <div class="modal-body">
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-genres" id="modal-meta"></div>
+        <div class="modal-desc" id="modal-desc"></div>
+        
+        <!-- Stream Action Area -->
+        <div id="modal-actions"></div>
+      </div>
     </div>
-  </footer>
+  </div>
 
   <script>
     const SUPABASE_URL = 'https://boiqvzakfztlujjdiyhm.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_9nHwP9SRRzgpxxslQ-gB6w_hT2Y-noa';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const DEFAULT_POSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="240" viewBox="0 0 160 240"><rect width="100%" height="100%" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="14">No Image</text></svg>';
+    let rawMovies = [];
+    let currentFilterType = 'All';
 
-    let allMoviesData = [];
+    document.addEventListener('DOMContentLoaded', fetchMovies);
 
-    async function loadData() {
-      const statusDiv = document.getElementById('status');
-      
-      if (!window.supabase) {
-        statusDiv.innerText = '❌ Supabase SDK load မဖြစ်ပါ။';
-        return;
-      }
-
-      const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      const { data, error } = await sbClient.from('movies').select('*').order('id', { ascending: false });
-
+    async function fetchMovies() {
+      const { data, error } = await sb.from('movies').select('*').order('id', { ascending: false });
       if (error) {
-        statusDiv.innerText = '❌ Error: ' + error.message;
+        console.error('Error:', error.message);
         return;
       }
-
-      allMoviesData = data || [];
-      
-      if (allMoviesData.length === 0) {
-        statusDiv.innerText = 'မည့်သည့် ရုပ်ရှင်မျှ မရှိသေးပါ။';
-        return;
-      }
-
-      statusDiv.style.display = 'none';
-      showHomeView();
+      rawMovies = data || [];
+      renderHeroBanner();
+      renderMovies(rawMovies);
     }
 
-    function createMovieCard(movie) {
-      const card = document.createElement('a');
-      card.className = 'card';
-      card.href = 'detail.html?id=' + movie.id;
-
-      const posterBox = document.createElement('div');
-      posterBox.className = 'poster-box';
-
-      const img = document.createElement('img');
-      img.src = movie.poster_url || DEFAULT_POSTER;
-      img.onerror = function() { this.src = DEFAULT_POSTER; };
-
-      // Quality Badge (Right Top)
-      const badgeQuality = document.createElement('div');
-      badgeQuality.className = 'badge-quality';
-      badgeQuality.innerText = movie.quality || '1080p';
-
-      // Rating Badge (Left Top)
-      const badgeRating = document.createElement('div');
-      badgeRating.className = 'badge-rating';
-      badgeRating.innerText = '⭐ ' + (movie.rating || 'N/A');
-
-      posterBox.appendChild(img);
-      posterBox.appendChild(badgeQuality);
-      posterBox.appendChild(badgeRating);
-
-      const info = document.createElement('div');
-      info.className = 'card-info';
-
-      const title = document.createElement('div');
-      title.className = 'card-title';
-      title.innerText = movie.title || 'Untitled';
-
-      const cat = document.createElement('div');
-      cat.className = 'card-cat';
-      cat.innerText = movie.category || 'Movie';
-
-      info.appendChild(title);
-      info.appendChild(cat);
-      card.appendChild(posterBox);
-      card.appendChild(info);
-
-      return card;
+    // Banner ပြသပေးခြင်း
+    function renderHeroBanner() {
+      if (rawMovies.length === 0) return;
+      const featured = rawMovies[0]; // နောက်ဆုံးတင်ထားသော ကားကို Banner ပြမည်
+      const hero = document.getElementById('hero-section');
+      hero.innerHTML = `
+        <div class="hero-banner" style="background-image: linear-gradient(to top, #0f172a, transparent), url('${featured.poster_url}');">
+          <div class="hero-content">
+            <h2>${featured.title}</h2>
+            <p>⭐ ${featured.rating || '8.0'} | ${featured.category || 'Movie'}</p>
+            <button class="btn-watch" style="width: auto; padding: 6px 16px; font-size: 12px;" onclick="openModal(${featured.id})">Watch Now</button>
+          </div>
+        </div>
+      `;
     }
 
-    function showHomeView() {
-      document.getElementById('view-all-page').style.display = 'none';
-      document.getElementById('home-view').style.display = 'block';
-
-      const limit = 6;
-
-      const moviesOnly = allMoviesData.filter(m => !m.type || m.type === 'Movie');
-      const seriesOnly = allMoviesData.filter(m => m.type === 'Series');
-
-      document.getElementById('latest-count').innerText = allMoviesData.length;
-      document.getElementById('movies-count').innerText = moviesOnly.length;
-      document.getElementById('series-count').innerText = seriesOnly.length;
-
-      const latestGrid = document.getElementById('latest-grid');
-      latestGrid.innerHTML = '';
-      allMoviesData.slice(0, limit).forEach(m => latestGrid.appendChild(createMovieCard(m)));
-
-      const moviesGrid = document.getElementById('movies-grid');
-      moviesGrid.innerHTML = '';
-      moviesOnly.slice(0, limit).forEach(m => moviesGrid.appendChild(createMovieCard(m)));
-
-      const seriesGrid = document.getElementById('series-grid');
-      seriesGrid.innerHTML = '';
-      seriesOnly.slice(0, limit).forEach(m => seriesGrid.appendChild(createMovieCard(m)));
-    }
-
-    function showViewAll(category) {
-      document.getElementById('home-view').style.display = 'none';
-      document.getElementById('view-all-page').style.display = 'block';
-
-      const grid = document.getElementById('view-all-grid');
-      const title = document.getElementById('view-all-title');
-      const countBadge = document.getElementById('view-all-count');
+    // List ရေးဆွဲပေးခြင်း
+    function renderMovies(list) {
+      const grid = document.getElementById('movie-grid');
+      document.getElementById('item-count').innerText = `${list.length} Items`;
       grid.innerHTML = '';
 
-      let listToDisplay = [];
-
-      if (category === 'latest') {
-        title.innerText = 'All Latest Updates';
-        listToDisplay = allMoviesData;
-      } else if (category === 'movies') {
-        title.innerText = 'All Movies';
-        listToDisplay = allMoviesData.filter(m => !m.type || m.type === 'Movie');
-      } else if (category === 'series') {
-        title.innerText = 'All Series';
-        listToDisplay = allMoviesData.filter(m => m.type === 'Series');
-      }
-
-      countBadge.innerText = listToDisplay.length;
-      listToDisplay.forEach(m => grid.appendChild(createMovieCard(m)));
-    }
-
-    function filterMovies() {
-      const query = document.getElementById('search-input').value.toLowerCase();
-      if (!query) {
-        showHomeView();
+      if (list.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-sub); padding: 40px;">No movies found.</div>`;
         return;
       }
 
-      document.getElementById('home-view').style.display = 'none';
-      document.getElementById('view-all-page').style.display = 'block';
+      list.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.onclick = () => openModal(m.id);
+        card.innerHTML = `
+          <div class="poster-wrapper">
+            <span class="badge-type">${m.type || 'Movie'}</span>
+            <span class="badge-rating">⭐ ${m.rating || 'N/A'}</span>
+            <img src="${m.poster_url}" alt="${m.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225'">
+          </div>
+          <div class="movie-info">
+            <div class="movie-title">${m.title}</div>
+            <div class="movie-meta">${m.category || 'General'}</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
 
-      const title = document.getElementById('view-all-title');
-      const countBadge = document.getElementById('view-all-count');
-      title.innerText = 'Search Results for: "' + query + '"';
+    // Filter - Categories
+    function filterCategory(category) {
+      document.querySelectorAll('.cat-pill').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
 
-      const grid = document.getElementById('view-all-grid');
-      grid.innerHTML = '';
-
-      const filtered = allMoviesData.filter(m => 
-        (m.title && m.title.toLowerCase().includes(query)) || 
-        (m.category && m.category.toLowerCase().includes(query))
-      );
-
-      countBadge.innerText = filtered.length;
-
-      if (filtered.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 30px;">ရှာဖွေမှုနှင့် ကိုက်ညီသော ရုပ်ရှင် မတွေ့ရှိပါ။</div>';
+      if (category === 'All') {
+        renderMovies(rawMovies);
       } else {
-        filtered.forEach(m => grid.appendChild(createMovieCard(m)));
+        const filtered = rawMovies.filter(m => m.category && m.category.toLowerCase().includes(category.toLowerCase()));
+        renderMovies(filtered);
       }
     }
 
-    window.addEventListener('DOMContentLoaded', loadData);
+    // Filter - Type (Movies vs Series from Bottom Nav)
+    function filterType(type) {
+      const filtered = rawMovies.filter(m => m.type === type);
+      document.getElementById('section-heading').innerText = type === 'Movie' ? 'Movies Only' : 'TV Series Only';
+      renderMovies(filtered);
+    }
+
+    // Real-time Search
+    function filterMovies() {
+      const text = document.getElementById('search-input').value.toLowerCase();
+      const filtered = rawMovies.filter(m => m.title.toLowerCase().includes(text));
+      renderMovies(filtered);
+    }
+
+    // Modal Details Window ဖွင့်ခြင်း
+    function openModal(id) {
+      const m = rawMovies.find(item => item.id === id);
+      if (!m) return;
+
+      document.getElementById('modal-poster').style.backgroundImage = `url('${m.poster_url}')`;
+      document.getElementById('modal-title').innerText = m.title;
+      document.getElementById('modal-meta').innerText = `${m.type || 'Movie'} • ⭐ ${m.rating || 'N/A'} • ${m.category || ''}`;
+      document.getElementById('modal-desc').innerText = m.description || 'No storyline available.';
+
+      const actionSec = document.getElementById('modal-actions');
+      actionSec.innerHTML = '';
+
+      if (m.type === 'Series' && m.episodes && m.episodes.length > 0) {
+        let epHTML = `<div style="font-weight:bold; margin-bottom:8px; font-size:13px; color:var(--accent-color);">Select Episode:</div><div class="episodes-list">`;
+        m.episodes.forEach(ep => {
+          epHTML += `
+            <a href="${ep.link}" target="_blank" class="ep-item">
+              <span>▶ ${ep.title}</span>
+              <i class="fa-solid fa-arrow-right-long"></i>
+            </a>
+          `;
+        });
+        epHTML += `</div>`;
+        actionSec.innerHTML = epHTML;
+      } else {
+        actionSec.innerHTML = `<a href="${m.telegram_link || '#'}" target="_blank" class="btn-watch"><i class="fa-paper-plane fa-solid"></i> Watch on Telegram</a>`;
+      }
+
+      document.getElementById('movie-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('movie-modal').style.display = 'none';
+    }
   </script>
 </body>
 </html>
