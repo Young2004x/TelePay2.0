@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: sans-serif; background: #0f172a; color: #fff; padding: 20px; max-width: 800px; margin: 0 auto; }
+    body { font-family: sans-serif; background: #0f172a; color: #fff; padding: 20px; max-width: 850px; margin: 0 auto; }
     h1, h2 { color: #f59e0b; }
     .card { background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #334155; }
     label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; color: #cbd5e1; }
@@ -29,27 +29,31 @@
     #msg { padding: 10px; margin-bottom: 15px; border-radius: 4px; display: none; font-weight: bold; }
     .success { background: #15803d; color: #fff; }
     .error { background: #b91c1c; color: #fff; }
+    
+    /* Series Episode Builder Styles */
+    .ep-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; background: #0f172a; padding: 8px; border-radius: 6px; border: 1px solid #334155; }
+    .ep-row input { margin-top: 0; }
+    .btn-add-ep { background: #10b981; color: #fff; padding: 8px 12px; font-size: 13px; width: auto; margin-top: 10px; }
+    .btn-remove-ep { background: #ef4444; color: #fff; border: none; padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
   </style>
 </head>
 <body>
 
   <h1>🎬 TelePlay Admin Panel</h1>
-  
   <div id="msg"></div>
 
-  <!-- Form -->
   <div class="card">
-    <h2 id="form-title">➕ Add New Movie/Series</h2>
+    <h2 id="form-title">➕ Add New Item</h2>
     <form id="movie-form">
       <input type="hidden" id="movie-id">
       
-      <label>Movie/Series Title *</label>
-      <input type="text" id="title" required placeholder="e.g. Moana 2">
+      <label>Title *</label>
+      <input type="text" id="title" required placeholder="e.g. Flex X Cop">
 
       <div class="row">
         <div>
           <label>Type *</label>
-          <select id="type">
+          <select id="type" onchange="toggleTypeFields()">
             <option value="Movie">Movie</option>
             <option value="Series">Series</option>
           </select>
@@ -63,7 +67,7 @@
       <div class="row">
         <div>
           <label>Quality</label>
-          <input type="text" id="quality" placeholder="e.g. 1080p, 720p, 4K" value="1080p">
+          <input type="text" id="quality" placeholder="e.g. 1080p, 720p" value="1080p">
         </div>
         <div>
           <label>Rating ⭐</label>
@@ -74,20 +78,29 @@
       <label>Poster Image URL *</label>
       <input type="url" id="poster_url" required placeholder="https://image.tmdb.org/t/p/w500/...">
 
-      <label>Telegram Stream/Download Link *</label>
-      <input type="url" id="telegram_link" required placeholder="https://t.me/c/...">
+      <!-- Movie Single Link Field -->
+      <div id="movie-link-section">
+        <label>Telegram Stream/Download Link (Movie) *</label>
+        <input type="url" id="telegram_link" placeholder="https://t.me/c/...">
+      </div>
 
-      <label>Description / Storyline</label>
-      <textarea id="description" rows="3" placeholder="Enter movie description..."></textarea>
+      <!-- Series Episode List Builder -->
+      <div id="series-episodes-section" style="display: none; margin-top: 15px; border-top: 1px dashed #334155; padding-top: 10px;">
+        <label style="color: #f59e0b; font-size: 15px;">📺 Series Episodes List</label>
+        <div id="episodes-container"></div>
+        <button type="button" class="btn-add-ep" onclick="addEpisodeRow()">+ Add Episode</button>
+      </div>
 
-      <button type="submit" id="btn-submit"> Save Movie</button>
+      <label style="margin-top: 15px;">Description / Storyline</label>
+      <textarea id="description" rows="3" placeholder="Enter storyline..."></textarea>
+
+      <button type="submit" id="btn-submit">Save Item</button>
       <button type="button" id="btn-cancel" class="btn-cancel" style="display:none;" onclick="resetForm()">Cancel Edit</button>
     </form>
   </div>
 
-  <!-- Data List -->
   <div class="card">
-    <h2>📋 Movie List (<span id="total-count">0</span>)</h2>
+    <h2>📋 Items List (<span id="total-count">0</span>)</h2>
     <div style="overflow-x: auto;">
       <table>
         <thead>
@@ -113,6 +126,48 @@
 
     let moviesList = [];
 
+    function toggleTypeFields() {
+      const type = document.getElementById('type').value;
+      const movieSection = document.getElementById('movie-link-section');
+      const seriesSection = document.getElementById('series-episodes-section');
+
+      if (type === 'Series') {
+        movieSection.style.display = 'none';
+        seriesSection.style.display = 'block';
+        if (document.querySelectorAll('.ep-row').length === 0) {
+          addEpisodeRow('S1 E01', '');
+        }
+      } else {
+        movieSection.style.display = 'block';
+        seriesSection.style.display = 'none';
+      }
+    }
+
+    function addEpisodeRow(name = '', link = '') {
+      const container = document.getElementById('episodes-container');
+      const div = document.createElement('div');
+      div.className = 'ep-row';
+      div.innerHTML = `
+        <input type="text" placeholder="Ep Name (e.g. S1 E01)" value="${name}" style="width: 30%;" class="ep-name">
+        <input type="url" placeholder="Telegram Link" value="${link}" style="width: 60%;" class="ep-link">
+        <button type="button" class="btn-remove-ep" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function getEpisodesData() {
+      const rows = document.querySelectorAll('.ep-row');
+      const list = [];
+      rows.forEach(r => {
+        const name = r.querySelector('.ep-name').value.trim();
+        const link = r.querySelector('.ep-link').value.trim();
+        if (name && link) {
+          list.push({ title: name, link: link });
+        }
+      });
+      return list;
+    }
+
     function showMsg(text, isError = false) {
       const msg = document.getElementById('msg');
       msg.innerText = text;
@@ -124,7 +179,7 @@
     async function fetchMovies() {
       const { data, error } = await sb.from('movies').select('*').order('id', { ascending: false });
       if (error) {
-        showMsg('Error fetching movies: ' + error.message, true);
+        showMsg('Error fetching data: ' + error.message, true);
         return;
       }
       moviesList = data || [];
@@ -159,25 +214,25 @@
     document.getElementById('movie-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('movie-id').value;
-      
+      const type = document.getElementById('type').value;
+
       const payload = {
         title: document.getElementById('title').value,
-        type: document.getElementById('type').value,
+        type: type,
         category: document.getElementById('category').value,
         quality: document.getElementById('quality').value,
         rating: document.getElementById('rating').value,
         poster_url: document.getElementById('poster_url').value,
-        telegram_link: document.getElementById('telegram_link').value,
+        telegram_link: type === 'Movie' ? document.getElementById('telegram_link').value : null,
+        episodes: type === 'Series' ? getEpisodesData() : [],
         description: document.getElementById('description').value
       };
 
       if (id) {
-        // Update
         const { error } = await sb.from('movies').update(payload).eq('id', id);
         if (error) showMsg('Update Error: ' + error.message, true);
         else showMsg('Updated successfully!');
       } else {
-        // Insert
         const { error } = await sb.from('movies').insert([payload]);
         if (error) showMsg('Insert Error: ' + error.message, true);
         else showMsg('Saved successfully!');
@@ -200,8 +255,16 @@
       document.getElementById('telegram_link').value = m.telegram_link || '';
       document.getElementById('description').value = m.description || '';
 
-      document.getElementById('form-title').innerText = '✏️ Edit Movie ID: ' + m.id;
-      document.getElementById('btn-submit').innerText = 'Update Movie';
+      const container = document.getElementById('episodes-container');
+      container.innerHTML = '';
+      if (m.type === 'Series' && m.episodes && m.episodes.length > 0) {
+        m.episodes.forEach(ep => addEpisodeRow(ep.title, ep.link));
+      }
+
+      toggleTypeFields();
+
+      document.getElementById('form-title').innerText = '✏️ Edit Item ID: ' + m.id;
+      document.getElementById('btn-submit').innerText = 'Update Item';
       document.getElementById('btn-cancel').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -219,8 +282,10 @@
     function resetForm() {
       document.getElementById('movie-form').reset();
       document.getElementById('movie-id').value = '';
-      document.getElementById('form-title').innerText = '➕ Add New Movie/Series';
-      document.getElementById('btn-submit').innerText = 'Save Movie';
+      document.getElementById('episodes-container').innerHTML = '';
+      toggleTypeFields();
+      document.getElementById('form-title').innerText = '➕ Add New Item';
+      document.getElementById('btn-submit').innerText = 'Save Item';
       document.getElementById('btn-cancel').style.display = 'none';
     }
 
