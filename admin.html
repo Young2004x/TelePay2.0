@@ -15,16 +15,26 @@
     input:focus, select:focus, textarea:focus { outline: none; border-color: #f59e0b; }
     .row { display: flex; gap: 12px; }
     .row > div { flex: 1; }
-    button { background: #f59e0b; color: #000; font-weight: bold; border: none; padding: 12px; margin-top: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; }
-    button:hover { background: #d97706; }
-    .btn-cancel { background: #475569; color: #fff; margin-top: 5px; }
     
+    /* Type Selection Radio Styles */
+    .type-selector { display: flex; gap: 15px; margin-top: 8px; }
+    .type-option { flex: 1; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px; text-align: center; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .type-option input { width: auto; margin: 0; }
+
+    /* Pure CSS Switcher */
+    #movie-link-section { display: block; }
+    #series-episodes-section { display: none; }
+
     /* Episode Builder Styles */
-    .ep-box { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-top: 10px; }
+    .ep-box { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; margin-top: 15px; }
     .ep-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
     .ep-row input { margin-top: 0; }
     .btn-add-ep { background: #10b981; color: #fff; padding: 8px 12px; font-size: 13px; width: auto; margin-top: 10px; }
     .btn-remove-ep { background: #ef4444; color: #fff; border: none; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+    button { background: #f59e0b; color: #000; font-weight: bold; border: none; padding: 12px; margin-top: 15px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; }
+    button:hover { background: #d97706; }
+    .btn-cancel { background: #475569; color: #fff; margin-top: 5px; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
     th, td { padding: 10px; border-bottom: 1px solid #334155; text-align: left; }
@@ -49,19 +59,23 @@
       <input type="hidden" id="movie-id">
       
       <label>Title *</label>
-      <input type="text" id="title" required placeholder="e.g. Moana 2">
+      <input type="text" id="title" required placeholder="e.g. Moana 2 / Flex X Cop">
 
       <div class="row">
         <div>
           <label>Type *</label>
-          <select id="item-type">
-            <option value="Movie">Movie</option>
-            <option value="Series">Series</option>
-          </select>
+          <div class="type-selector">
+            <label class="type-option">
+              <input type="radio" name="item_type" value="Movie" checked onchange="switchType('Movie')"> 🎬 Movie
+            </label>
+            <label class="type-option">
+              <input type="radio" name="item_type" value="Series" onchange="switchType('Series')"> 📺 Series
+            </label>
+          </div>
         </div>
         <div>
           <label>Category (Genre) *</label>
-          <input type="text" id="category" required placeholder="e.g. Action, Animation">
+          <input type="text" id="category" required placeholder="e.g. Action, Drama">
         </div>
       </div>
 
@@ -79,24 +93,24 @@
       <label>Poster Image URL *</label>
       <input type="url" id="poster_url" required placeholder="https://image.tmdb.org/t/p/w500/...">
 
-      <!-- Movie Single Link (Show only when Type = Movie) -->
+      <!-- Movie Single Link Section -->
       <div id="movie-link-section">
         <label>Telegram Stream/Download Link (Movie) *</label>
         <input type="url" id="telegram_link" placeholder="https://t.me/c/...">
       </div>
 
-      <!-- Series Episodes Section (Show only when Type = Series) -->
-      <div id="series-episodes-section" class="ep-box" style="display: none;">
+      <!-- Series Episodes Section -->
+      <div id="series-episodes-section" class="ep-box">
         <label style="color: #f59e0b; margin:0;">📺 Series Episodes List</label>
         <div id="episodes-container"></div>
-        <button type="button" id="btn-add-ep" class="btn-add-ep">+ Add Episode</button>
+        <button type="button" onclick="addEpisodeRow()" class="btn-add-ep">+ Add Episode</button>
       </div>
 
-      <label>Description / Storyline</label>
-      <textarea id="description" rows="3" placeholder="Enter movie or series description..."></textarea>
+      <label style="margin-top: 15px;">Description / Storyline</label>
+      <textarea id="description" rows="3" placeholder="Enter storyline..."></textarea>
 
       <button type="submit" id="btn-submit">Save Item</button>
-      <button type="button" id="btn-cancel" class="btn-cancel" style="display:none;">Cancel Edit</button>
+      <button type="button" id="btn-cancel" class="btn-cancel" style="display:none;" onclick="resetForm()">Cancel Edit</button>
     </form>
   </div>
 
@@ -127,24 +141,8 @@
 
     let moviesList = [];
 
-    // Episode Row တစ်ခုချင်းစီ ထည့်ပေးသည့် Function
-    function addEpisodeRow(name = '', link = '') {
-      const container = document.getElementById('episodes-container');
-      const div = document.createElement('div');
-      div.className = 'ep-row';
-      div.innerHTML = `
-        <input type="text" placeholder="Ep Name (e.g. S1 E01)" value="${name}" style="width: 35%;" class="ep-name">
-        <input type="url" placeholder="Telegram Link" value="${link}" style="width: 55%;" class="ep-link">
-        <button type="button" class="btn-remove-ep">✕</button>
-      `;
-      
-      div.querySelector('.btn-remove-ep').addEventListener('click', () => div.remove());
-      container.appendChild(div);
-    }
-
-    // Select Box ကို Series / Movie ချိန်းလိုက်ရင် အလုပ်လုပ်မည့် Function
-    function checkTypeChange() {
-      const type = document.getElementById('item-type').value;
+    // Switch between Movie & Series UI
+    function switchType(type) {
       const movieSec = document.getElementById('movie-link-section');
       const seriesSec = document.getElementById('series-episodes-section');
       const container = document.getElementById('episodes-container');
@@ -159,6 +157,27 @@
         movieSec.style.display = 'block';
         seriesSec.style.display = 'none';
       }
+    }
+
+    // Add new Episode Row
+    function addEpisodeRow(name = '', link = '') {
+      const container = document.getElementById('episodes-container');
+      const div = document.createElement('div');
+      div.className = 'ep-row';
+      div.innerHTML = `
+        <input type="text" placeholder="Ep Name (e.g. S1 E01)" value="${name}" style="width: 35%;" class="ep-name">
+        <input type="url" placeholder="Telegram Link" value="${link}" style="width: 55%;" class="ep-link">
+        <button type="button" class="btn-remove-ep" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function getSelectedType() {
+      const radios = document.getElementsByName('item_type');
+      for (let r of radios) {
+        if (r.checked) return r.value;
+      }
+      return 'Movie';
     }
 
     function getEpisodesData() {
@@ -218,7 +237,7 @@
     document.getElementById('movie-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('movie-id').value;
-      const type = document.getElementById('item-type').value;
+      const type = getSelectedType();
 
       const payload = {
         title: document.getElementById('title').value,
@@ -251,7 +270,13 @@
       if (!m) return;
       document.getElementById('movie-id').value = m.id;
       document.getElementById('title').value = m.title || '';
-      document.getElementById('item-type').value = m.type || 'Movie';
+      
+      const type = m.type || 'Movie';
+      const radios = document.getElementsByName('item_type');
+      for (let r of radios) {
+        r.checked = (r.value === type);
+      }
+
       document.getElementById('category').value = m.category || '';
       document.getElementById('quality').value = m.quality || '1080p';
       document.getElementById('rating').value = m.rating || '8.0';
@@ -261,11 +286,11 @@
 
       const container = document.getElementById('episodes-container');
       container.innerHTML = '';
-      if (m.type === 'Series' && m.episodes && m.episodes.length > 0) {
+      if (type === 'Series' && m.episodes && m.episodes.length > 0) {
         m.episodes.forEach(ep => addEpisodeRow(ep.title, ep.link));
       }
 
-      checkTypeChange();
+      switchType(type);
 
       document.getElementById('form-title').innerText = '✏️ Edit Item ID: ' + m.id;
       document.getElementById('btn-submit').innerText = 'Update Item';
@@ -287,19 +312,15 @@
       document.getElementById('movie-form').reset();
       document.getElementById('movie-id').value = '';
       document.getElementById('episodes-container').innerHTML = '';
-      checkTypeChange();
+      const radios = document.getElementsByName('item_type');
+      if (radios.length > 0) radios[0].checked = true;
+      switchType('Movie');
       document.getElementById('form-title').innerText = '➕ Add New Item';
       document.getElementById('btn-submit').innerText = 'Save Item';
       document.getElementById('btn-cancel').style.display = 'none';
     }
 
-    // Event Listeners (ခလုတ်နှိပ်ခြင်း/ပြောင်းလဲခြင်းများကို နားထောင်ပေးခြင်း)
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchMovies();
-      document.getElementById('item-type').addEventListener('change', checkTypeChange);
-      document.getElementById('btn-add-ep').addEventListener('click', () => addEpisodeRow());
-      document.getElementById('btn-cancel').addEventListener('click', resetForm);
-    });
+    window.addEventListener('DOMContentLoaded', fetchMovies);
   </script>
 </body>
 </html>
