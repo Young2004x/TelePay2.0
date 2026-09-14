@@ -50,15 +50,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 20px;
-      margin-bottom: 10px;
+      margin-top: 25px;
+      margin-bottom: 12px;
     }
     .section-title {
       font-size: 16px;
       font-weight: bold;
       color: #f8fafc;
       border-left: 3px solid #f59e0b;
-      padding-left: 6px;
+      padding-left: 8px;
     }
     .view-all-btn {
       color: #f59e0b;
@@ -84,17 +84,19 @@
       border: 1px solid #334155;
     }
 
+    /* Mobile First Grid */
     .grid { 
       display: grid; 
       grid-template-columns: repeat(3, 1fr); 
-      gap: 8px; 
+      gap: 10px; 
     }
 
+    /* Desktop Responsive Layout */
     @media (min-width: 768px) {
-      body { padding: 20px; }
-      h1 { font-size: 24px; }
+      body { padding: 20px 40px; max-width: 1300px; margin: 0 auto; }
+      h1 { font-size: 26px; }
       .grid { 
-        grid-template-columns: repeat(6, 1fr); 
+        grid-template-columns: repeat(5, 1fr); 
         gap: 16px; 
       }
       .search-box input { width: 220px; font-size: 13px; padding: 8px 12px 8px 32px; }
@@ -104,48 +106,69 @@
       .view-all-btn { font-size: 13px; }
     }
 
+    @media (min-width: 1100px) {
+      .grid { 
+        grid-template-columns: repeat(6, 1fr); 
+      }
+    }
+
     .card { 
       background: #1e293b; 
-      border-radius: 6px; 
+      border-radius: 8px; 
       overflow: hidden; 
       text-decoration: none; 
       color: #fff; 
-      display: block; 
-      transition: transform 0.2s; 
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s; 
+      border: 1px solid #334155;
     }
-    .card:hover { transform: translateY(-3px); }
+    .card:hover { 
+      transform: translateY(-4px); 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
     
-    .poster-box { position: relative; width: 100%; height: 160px; background: #334155; }
-    @media (min-width: 768px) {
-      .poster-box { height: 220px; }
+    /* Movie Poster Frame (2:3 Aspect Ratio) */
+    .poster-box { 
+      position: relative; 
+      width: 100%; 
+      aspect-ratio: 2 / 3; 
+      background: #0f172a; 
+      overflow: hidden;
     }
-    .poster-box img { width: 100%; height: 100%; object-fit: cover; }
+    .poster-box img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      display: block;
+    }
     
     .badge-quality {
       position: absolute;
-      top: 4px;
-      right: 4px;
-      background: rgba(245, 158, 11, 0.9);
+      top: 6px;
+      right: 6px;
+      background: rgba(245, 158, 11, 0.95);
       color: #000;
       font-size: 9px;
       font-weight: bold;
-      padding: 2px 4px;
+      padding: 2px 5px;
       border-radius: 3px;
       text-transform: uppercase;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
-    .card-info { padding: 6px; }
-    .card-title { font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-cat { font-size: 9px; color: #94a3b8; }
+    .card-info { padding: 8px 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+    .card-title { font-weight: bold; font-size: 12px; margin-bottom: 2px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-cat { font-size: 10px; color: #94a3b8; }
     
     @media (min-width: 768px) {
-      .card-info { padding: 8px; }
-      .card-title { font-size: 13px; margin-bottom: 3px; }
+      .card-info { padding: 10px; }
+      .card-title { font-size: 14px; margin-bottom: 4px; }
       .card-cat { font-size: 11px; }
-      .badge-quality { font-size: 10px; top: 6px; right: 6px; padding: 2px 5px; }
+      .badge-quality { font-size: 10px; top: 8px; right: 8px; padding: 3px 6px; }
     }
 
-    #status { text-align: center; padding: 30px; color: #f59e0b; font-size: 15px; }
+    #status { text-align: center; padding: 40px; color: #f59e0b; font-size: 15px; }
   </style>
 </head>
 <body>
@@ -192,7 +215,7 @@
     const SUPABASE_URL = 'https://boiqvzakfztlujjdiyhm.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_9nHwP9SRRzgpxxslQ-gB6w_hT2Y-noa';
 
-    const DEFAULT_POSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="230" viewBox="0 0 160 230"><rect width="100%" height="100%" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="14">No Image</text></svg>';
+    const DEFAULT_POSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="240" viewBox="0 0 160 240"><rect width="100%" height="100%" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="14">No Image</text></svg>';
 
     let allMoviesData = [];
 
@@ -270,7 +293,8 @@
       const latestGrid = document.getElementById('latest-grid');
       latestGrid.innerHTML = '';
       allMoviesData.slice(0, limit).forEach(m => latestGrid.appendChild(createMovieCard(m)));
-const moviesGrid = document.getElementById('movies-grid');
+
+      const moviesGrid = document.getElementById('movies-grid');
       moviesGrid.innerHTML = '';
       const moviesOnly = allMoviesData.filter(m => !m.type || m.type === 'Movie');
       moviesOnly.slice(0, limit).forEach(m => moviesGrid.appendChild(createMovieCard(m)));
