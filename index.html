@@ -53,6 +53,13 @@
       margin-top: 25px;
       margin-bottom: 12px;
     }
+    
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
     .section-title {
       font-size: 16px;
       font-weight: bold;
@@ -60,6 +67,19 @@
       border-left: 3px solid #f59e0b;
       padding-left: 8px;
     }
+
+    /* Category Count Badge */
+    .count-badge {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
     .view-all-btn {
       color: #f59e0b;
       text-decoration: none;
@@ -103,6 +123,7 @@
       .search-box input:focus { width: 260px; }
       .search-icon { left: 10px; font-size: 14px; }
       .section-title { font-size: 18px; }
+      .count-badge { font-size: 12px; padding: 2px 10px; }
       .view-all-btn { font-size: 13px; }
     }
 
@@ -169,6 +190,95 @@
     }
 
     #status { text-align: center; padding: 40px; color: #f59e0b; font-size: 15px; }
+
+    /* Footer Design */
+    footer {
+      margin-top: 50px;
+      padding: 30px 15px 20px;
+      background: #090d16;
+      border-top: 1px solid #1e293b;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 13px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .footer-brand {
+      font-size: 22px;
+      font-weight: 800;
+      color: #f59e0b;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .footer-credit-text {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
+    .footer-disclaimer {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .footer-pills {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      display: inline-block;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .pill-amber {
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #1e293b;
+      padding-top: 15px;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .back-to-top {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f59e0b;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+
+    .back-to-top:hover {
+      background: #f59e0b;
+      color: #000;
+    }
   </style>
 </head>
 <body>
@@ -184,20 +294,32 @@
   <div id="status">Loading updates...</div>
 
   <div id="home-view" style="display: none;">
+    <!-- Latest Updates -->
     <div class="section-header">
-      <div class="section-title">Latest Updates</div>
+      <div class="title-group">
+        <div class="section-title">Latest Updates</div>
+        <span class="count-badge" id="latest-count">0</span>
+      </div>
       <span class="view-all-btn" onclick="showViewAll('latest')">View All ›</span>
     </div>
     <div id="latest-grid" class="grid"></div>
 
+    <!-- Movies -->
     <div class="section-header">
-      <div class="section-title">Movies</div>
+      <div class="title-group">
+        <div class="section-title">Movies</div>
+        <span class="count-badge" id="movies-count">0</span>
+      </div>
       <span class="view-all-btn" onclick="showViewAll('movies')">View All ›</span>
     </div>
     <div id="movies-grid" class="grid"></div>
 
+    <!-- Series -->
     <div class="section-header">
-      <div class="section-title">Series</div>
+      <div class="title-group">
+        <div class="section-title">Series</div>
+        <span class="count-badge" id="series-count">0</span>
+      </div>
       <span class="view-all-btn" onclick="showViewAll('series')">View All ›</span>
     </div>
     <div id="series-grid" class="grid"></div>
@@ -206,10 +328,41 @@
   <div id="view-all-page" style="display: none;">
     <div class="back-btn" onclick="showHomeView()">← Back to Home</div>
     <div class="section-header" style="margin-top: 0;">
-      <div class="section-title" id="view-all-title">All Items</div>
+      <div class="title-group">
+        <div class="section-title" id="view-all-title">All Items</div>
+        <span class="count-badge" id="view-all-count">0</span>
+      </div>
     </div>
     <div id="view-all-grid" class="grid"></div>
   </div>
+
+  <footer>
+    <div class="footer-brand">TELEPLAY</div>
+    
+    <div class="footer-credit-text">
+      မူရင်းဗီဒီယို ဖန်တီးသူများနှင့် ဘာသာပြန်အဖွဲ့များအားလုံးကို Full Credit ပေးပါသည်။
+    </div>
+    
+    <div class="footer-disclaimer">
+      All streamed content is delivered via third-party services.<br>
+      No files are stored on our servers.
+    </div>
+
+    <div class="footer-pills">
+      <div class="pill pill-amber">Made by <strong>YoungX &amp; Claude AI</strong></div>
+      <div class="pill">Powered by <strong>Supabase</strong></div>
+    </div>
+
+    <div class="footer-pills">
+      <div class="pill">Platforms: <strong>Ysflix · Hdhub4u · AnimeXin · Bioscope · Homietv</strong></div>
+    </div>
+
+    <div class="footer-bottom">
+      <div style="width: 36px;"></div>
+      <div>© 2026 TelePlay. All rights reserved.</div>
+      <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'});" title="Back to Top">↑</button>
+    </div>
+  </footer>
 
   <script>
     const SUPABASE_URL = 'https://boiqvzakfztlujjdiyhm.supabase.co';
@@ -290,18 +443,26 @@
 
       const limit = 6;
 
+      // Filter Data
+      const moviesOnly = allMoviesData.filter(m => !m.type || m.type === 'Movie');
+      const seriesOnly = allMoviesData.filter(m => m.type === 'Series');
+
+      // Update Counts
+      document.getElementById('latest-count').innerText = allMoviesData.length;
+      document.getElementById('movies-count').innerText = moviesOnly.length;
+      document.getElementById('series-count').innerText = seriesOnly.length;
+
+      // Render Grids
       const latestGrid = document.getElementById('latest-grid');
       latestGrid.innerHTML = '';
       allMoviesData.slice(0, limit).forEach(m => latestGrid.appendChild(createMovieCard(m)));
 
       const moviesGrid = document.getElementById('movies-grid');
       moviesGrid.innerHTML = '';
-      const moviesOnly = allMoviesData.filter(m => !m.type || m.type === 'Movie');
       moviesOnly.slice(0, limit).forEach(m => moviesGrid.appendChild(createMovieCard(m)));
 
       const seriesGrid = document.getElementById('series-grid');
       seriesGrid.innerHTML = '';
-      const seriesOnly = allMoviesData.filter(m => m.type === 'Series');
       seriesOnly.slice(0, limit).forEach(m => seriesGrid.appendChild(createMovieCard(m)));
     }
 
@@ -311,6 +472,7 @@
 
       const grid = document.getElementById('view-all-grid');
       const title = document.getElementById('view-all-title');
+      const countBadge = document.getElementById('view-all-count');
       grid.innerHTML = '';
 
       let listToDisplay = [];
@@ -326,6 +488,7 @@
         listToDisplay = allMoviesData.filter(m => m.type === 'Series');
       }
 
+      countBadge.innerText = listToDisplay.length;
       listToDisplay.forEach(m => grid.appendChild(createMovieCard(m)));
     }
 
@@ -340,6 +503,7 @@
       document.getElementById('view-all-page').style.display = 'block';
 
       const title = document.getElementById('view-all-title');
+      const countBadge = document.getElementById('view-all-count');
       title.innerText = 'Search Results for: "' + query + '"';
 
       const grid = document.getElementById('view-all-grid');
@@ -349,6 +513,8 @@
         (m.title && m.title.toLowerCase().includes(query)) || 
         (m.category && m.category.toLowerCase().includes(query))
       );
+
+      countBadge.innerText = filtered.length;
 
       if (filtered.length === 0) {
         grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 30px;">ရှာဖွေမှုနှင့် ကိုက်ညီသော ရုပ်ရှင် မတွေ့ရှိပါ။</div>';
