@@ -164,6 +164,7 @@
       display: block;
     }
     
+    /* Quality Badge (Right Top) */
     .badge-quality {
       position: absolute;
       top: 6px;
@@ -178,6 +179,22 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
+    /* Rating Badge (Left Top) */
+    .badge-rating {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: rgba(15, 23, 42, 0.85);
+      color: #f59e0b;
+      font-size: 9px;
+      font-weight: bold;
+      padding: 2px 5px;
+      border-radius: 3px;
+      backdrop-filter: blur(2px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
     .card-info { padding: 8px 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
     .card-title { font-weight: bold; font-size: 12px; margin-bottom: 2px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .card-cat { font-size: 10px; color: #94a3b8; }
@@ -186,7 +203,9 @@
       .card-info { padding: 10px; }
       .card-title { font-size: 14px; margin-bottom: 4px; }
       .card-cat { font-size: 11px; }
-      .badge-quality { font-size: 10px; top: 8px; right: 8px; padding: 3px 6px; }
+      .badge-quality, .badge-rating { font-size: 10px; top: 8px; padding: 3px 6px; }
+      .badge-quality { right: 8px; }
+      .badge-rating { left: 8px; }
     }
 
     #status { text-align: center; padding: 40px; color: #f59e0b; font-size: 15px; }
@@ -411,12 +430,19 @@
       img.src = movie.poster_url || DEFAULT_POSTER;
       img.onerror = function() { this.src = DEFAULT_POSTER; };
 
-      const badge = document.createElement('div');
-      badge.className = 'badge-quality';
-      badge.innerText = movie.quality || '1080p';
+      // Quality Badge (Right Top)
+      const badgeQuality = document.createElement('div');
+      badgeQuality.className = 'badge-quality';
+      badgeQuality.innerText = movie.quality || '1080p';
+
+      // Rating Badge (Left Top)
+      const badgeRating = document.createElement('div');
+      badgeRating.className = 'badge-rating';
+      badgeRating.innerText = '⭐ ' + (movie.rating || 'N/A');
 
       posterBox.appendChild(img);
-      posterBox.appendChild(badge);
+      posterBox.appendChild(badgeQuality);
+      posterBox.appendChild(badgeRating);
 
       const info = document.createElement('div');
       info.className = 'card-info';
@@ -443,16 +469,13 @@
 
       const limit = 6;
 
-      // Filter Data
       const moviesOnly = allMoviesData.filter(m => !m.type || m.type === 'Movie');
       const seriesOnly = allMoviesData.filter(m => m.type === 'Series');
 
-      // Update Counts
       document.getElementById('latest-count').innerText = allMoviesData.length;
       document.getElementById('movies-count').innerText = moviesOnly.length;
       document.getElementById('series-count').innerText = seriesOnly.length;
 
-      // Render Grids
       const latestGrid = document.getElementById('latest-grid');
       latestGrid.innerHTML = '';
       allMoviesData.slice(0, limit).forEach(m => latestGrid.appendChild(createMovieCard(m)));
