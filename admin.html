@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TelePlay - Admin Panel</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 20px; }
+    .container { max-width: 650px; margin: 0 auto; background: #1e293b; padding: 20px; border-radius: 8px; }
+    h2 { color: #f59e0b; margin-top: 0; text-align: center; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+    input, select, textarea { width: 100%; padding: 8px 10px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 13px; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: #f59e0b; }
+    .row { display: flex; gap: 10px; }
+    .col { flex: 1; }
+    button { width: 100%; background: #f59e0b; border: none; padding: 10px; color: #000; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #d97706; }
+    
+    .list-title { margin-top: 30px; border-top: 1px solid #334155; padding-top: 15px; font-weight: bold; }
+    .movie-item { display: flex; flex-direction: column; gap: 6px; background: #0f172a; padding: 12px; border-radius: 6px; margin-top: 10px; font-size: 12px; border: 1px solid #334155; }
+    .movie-header { display: flex; justify-content: space-between; align-items: center; }
+    .movie-desc { color: #cbd5e1; font-size: 11px; white-space: pre-wrap; background: #1e293b; padding: 8px; border-radius: 4px; margin-top: 4px; }
+    .movie-link { color: #38bdf8; word-break: break-all; font-size: 11px; }
+    .btn-del { background: #ef4444; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; width: auto; font-size: 11px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>TelePlay Admin Panel</h2>
+    
+    <form id="movieForm">
+      <div class="form-group">
+        <label>Movie Title (ဇာတ်ကားအမည်)</label>
+        <input type="text" id="title" placeholder="e.g. Avatar: The Way of Water" required>
+      </div>
+
+      <div class="row">
+        <div class="col form-group">
+          <label>Content Type (အမျိုးအစား)</label>
+          <select id="type">
+            <option value="Movie">Movie (ရုပ်ရှင်)</option>
+            <option value="Series">Series (ဇာတ်လမ်းတွဲ)</option>
+          </select>
+        </div>
+        <div class="col form-group">
+          <label>Category (အမျိုးအစား ခေါင်းစဉ်)</label>
+          <input type="text" id="category" placeholder="e.g. Action, Sci-Fi" required>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col form-group">
+          <label>Quality Badge (အရည်အသွေး)</label>
+          <input type="text" id="quality" value="1080p">
+        </div>
+        <div class="col form-group">
+          <label>Poster Image URL (ပုံ Link)</label>
+          <input type="url" id="poster_url" placeholder="https://..." required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Telegram Channel Link (ကြည့်ရန် Link / Downlink)</label>
+        <input type="url" id="telegram_link" placeholder="https://t.me/..." required>
+      </div>
+
+      <div class="form-group">
+        <label>Description (အညွှန်း သို့မဟုတ် အကြောင်းအရာ)</label>
+        <textarea id="description" rows="4" placeholder="ဇာတ်လမ်းအကြောင်းအရာ ရေးရန်..."></textarea>
+      </div>
+
+      <button type="submit" id="saveBtn">Save Movie</button>
+    </form>
+
+    <div class="list-title">Uploaded Movies/Series</div>
+    <div id="movieList">Loading...</div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://boiqvzakfztlujjdiyhm.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_9nHwP9SRRzgpxxslQ-gB6w_hT2Y-noa";
+
+    let sbClient = null;
+
+    function initSupabase() {
+      if (window.supabase) {
+        sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        loadAdminMovies();
+      } else {
+        document.getElementById("movieList").innerText = "Supabase SDK load မဖြစ်ပါ။ အင်တာနက် လိုင်းစစ်ပေးပါ။";
+      }
+    }
+
+    async function loadAdminMovies() {
+      const listDiv = document.getElementById("movieList");
+      if (!sbClient) return;
+
+      const response = await sbClient.from("movies").select("*").order("id", { ascending: false });
+      const data = response.data;
+      const error = response.error;
+
+      if (error) {
+        listDiv.innerText = "Error loading movies: " + error.message;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        listDiv.innerText = "တင်ထားသော ဇာတ်ကား မရှိသေးပါ။";
+        return;
+      }
+
+      listDiv.innerHTML = "";
+      data.forEach(function(movie) {
+        const item = document.createElement("div");
+        item.className = "movie-item";
+
+        const headerDiv = document.createElement("div");
+        headerDiv.className = "movie-header";
+
+        const titleSpan = document.createElement("strong");
+        titleSpan.textContent = (movie.title || "Untitled") + " (" + (movie.type || "Movie") + ")";
+        
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn-del";
+        delBtn.textContent = "Delete";
+        delBtn.onclick = function() {
+          deleteMovie(movie.id);
+        };
+
+        headerDiv.appendChild(titleSpan);
+        headerDiv.appendChild(delBtn);
+        item.appendChild(headerDiv);
+
+        if (movie.telegram_link) {
+          const linkDiv = document.createElement("div");
+          linkDiv.className = "movie-link";
+          linkDiv.innerHTML = "🔗 <strong>Link:</strong> <a href=\"" + movie.telegram_link + "\" target=\"_blank\" style=\"color: #38bdf8;\">" + movie.telegram_link + "</a>";
+          item.appendChild(linkDiv);
+        }
+
+        if (movie.description) {
+          const descDiv = document.createElement("div");
+          descDiv.className = "movie-desc";
+          descDiv.textContent = "📝 " + movie.description;
+          item.appendChild(descDiv);
+        }
+
+        listDiv.appendChild(item);
+      });
+    }
+
+    document.getElementById("movieForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const saveBtn = document.getElementById("saveBtn");
+      saveBtn.innerText = "Saving...";
+      saveBtn.disabled = true;
+
+      const newMovie = {
+        title: document.getElementById("title").value,
+        type: document.getElementById("type").value,
+        category: document.getElementById("category").value,
+        quality: document.getElementById("quality").value,
+        poster_url: document.getElementById("poster_url").value,
+        telegram_link: document.getElementById("telegram_link").value,
+        description: document.getElementById("description").value
+      };
+
+      const response = await sbClient.from("movies").insert([newMovie]);
+      const error = response.error;
+
+      if (error) {
+        alert("Error: " + error.message);
+      } else {
+        alert("ဇာတ်ကားသစ် အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+        document.getElementById("movieForm").reset();
+        loadAdminMovies();
+      }
+
+      saveBtn.innerText = "Save Movie";
+      saveBtn.disabled = false;
+    });
+
+    async function deleteMovie(id) {
+      if (!confirm("ဒီဇာတ်ကားကို ဖျက်ရန် သေချာပါသလား?")) return;
+
+      const response = await sbClient.from("movies").delete().eq("id", id);
+      const error = response.error;
+
+      if (error) {
+        alert("Error: " + error.message);
+      } else {
+        loadAdminMovies();
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", initSupabase);
+  </script>
+</body>
+</html>

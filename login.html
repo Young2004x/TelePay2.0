@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TelePlay — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0B0C10;
+    --bg-1:#15161D;
+    --bg-2:#1D1F29;
+    --line:#2A2C38;
+    --text-hi:#F0EEE8;
+    --text-lo:#8D8FA0;
+    --gold:#D4AF37;
+    --gold-dim:#8A7328;
+    --teal:#3FBFAE;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:
+      radial-gradient(ellipse 900px 500px at 20% -10%, rgba(212,175,55,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 600px at 100% 100%, rgba(63,191,174,0.08), transparent 60%),
+      var(--bg-0);
+    color:var(--text-hi);
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 20px;
+  }
+
+  .stage{
+    width:100%;
+    max-width:920px;
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-radius:18px;
+    overflow:hidden;
+  }
+  @media (max-width:760px){
+    .stage{grid-template-columns:1fr;}
+    .side{display:none;}
+  }
+
+  /* Left cinematic panel */
+  .side{
+    position:relative;
+    padding:44px 40px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    background:
+      linear-gradient(180deg, rgba(11,12,16,0.2), rgba(11,12,16,0.85)),
+      repeating-linear-gradient(90deg, #1B1D26 0 3px, #17181F 3px 46px);
+    border-right:1px solid var(--line);
+  }
+  .side::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(212,175,55,0.16), transparent 45%),
+      radial-gradient(circle at 80% 75%, rgba(63,191,174,0.14), transparent 45%);
+    mix-blend-mode:screen;
+  }
+  .brandmark{position:relative; z-index:1;}
+  .brandmark .mark{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:34px;
+    letter-spacing:-0.01em;
+  }
+  .brandmark .mark span{color:var(--gold);}
+  .brandmark .tag{
+    margin-top:8px;
+    font-size:14px;
+    color:var(--text-lo);
+    max-width:26ch;
+    line-height:1.5;
+  }
+
+  .stats{position:relative; z-index:1; display:flex; flex-direction:column; gap:14px;}
+  .stat-row{display:flex; align-items:baseline; gap:10px;}
+  .stat-num{font-family:'Fraunces',serif; font-size:22px; color:var(--text-hi); min-width:64px;}
+  .stat-label{font-size:13px; color:var(--text-lo);}
+
+  /* Right form panel */
+  .form-panel{padding:44px 40px; display:flex; flex-direction:column; gap:22px;}
+
+  .tabs{display:flex; gap:26px; border-bottom:1px solid var(--line);}
+  .tab{
+    background:none; border:none; cursor:pointer;
+    font-family:'Inter'; font-size:15px; font-weight:500;
+    color:var(--text-lo); padding:0 0 12px 0;
+    border-bottom:2px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .tab.active{color:var(--text-hi); border-bottom-color:var(--gold);}
+
+  form{display:none; flex-direction:column; gap:14px;}
+  form.active{display:flex;}
+
+  label{font-size:13px; color:var(--text-lo);}
+  .field{display:flex; flex-direction:column; gap:6px;}
+  input[type=text], input[type=password], input[type=email]{
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:11px 13px;
+    color:var(--text-hi);
+    font-size:14px;
+    font-family:'Inter';
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  input:focus{border-color:var(--gold-dim);}
+  input::placeholder{color:#5C5E6C;}
+
+  .row-between{display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--text-lo);}
+  .remember{display:flex; align-items:center; gap:7px;}
+  .remember input{accent-color:var(--gold);}
+  .link{color:var(--teal); text-decoration:none; cursor:pointer;}
+  .link:hover{text-decoration:underline;}
+
+  .btn-primary{
+    margin-top:4px;
+    background:linear-gradient(180deg, #E4C158, var(--gold));
+    color:#1A1406;
+    border:none;
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:filter .15s ease;
+  }
+  .btn-primary:hover{filter:brightness(1.06);}
+
+  .divider{display:flex; align-items:center; gap:12px; color:var(--text-lo); font-size:12px;}
+  .divider::before, .divider::after{content:""; flex:1; height:1px; background:var(--line);}
+
+  .btn-google{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--bg-2); border:1px solid var(--line); border-radius:8px;
+    padding:11px 14px; color:var(--text-hi); font-size:14px; font-weight:500;
+    cursor:pointer; text-decoration:none;
+  }
+  .btn-google:hover{border-color:#3A3D4C;}
+
+  .btn-guest{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:none; border:1px dashed var(--line); border-radius:8px;
+    padding:11px 14px; color:var(--text-lo); font-size:13.5px;
+    cursor:pointer;
+  }
+  .btn-guest:hover{border-color:var(--teal); color:var(--text-hi);}
+
+  .fine-print{font-size:12.5px; color:var(--text-lo); text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="side">
+    <div class="brandmark">
+      <div class="mark">Tele<span>Play</span></div>
+      <div class="tag">Login လုပ်ပြီး ရုပ်ရှင်၊ ဒရာမာနဲ့ တိုက်ရိုက်ထုတ်လွှင့်မှုတွေကို ခံစားလိုက်ပါ။</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-row"><span class="stat-num">2.4K</span><span class="stat-label">Movies &amp; Dramas</span></div>
+      <div class="stat-row"><span class="stat-num">210</span><span class="stat-label">Collections</span></div>
+      <div class="stat-row"><span class="stat-num">48</span><span class="stat-label">Live Channels</span></div>
+      <div class="stat-row"><span class="stat-num">6.1K</span><span class="stat-label">Members</span></div>
+    </div>
+  </div>
+
+  <div class="form-panel">
+    <div class="tabs">
+      <button class="tab active" data-target="login-form">Login</button>
+      <button class="tab" data-target="register-form">Register</button>
+    </div>
+
+    <form id="login-form" class="active">
+      <div class="field">
+        <label for="lu">Username</label>
+        <input type="text" id="lu" placeholder="your username">
+      </div>
+      <div class="field">
+        <label for="lp">Password</label>
+        <input type="password" id="lp" placeholder="••••••••">
+      </div>
+      <div class="row-between">
+        <label class="remember"><input type="checkbox"> Remember me</label>
+        <span class="link">Forgot password?</span>
+      </div>
+      <button type="submit" class="btn-primary">Log in</button>
+
+      <div class="divider">or</div>
+      <a href="#" class="btn-google">Continue with Google</a>
+
+      <div class="divider">or</div>
+      <button type="button" class="btn-guest" id="guest-btn">👤 Guest အနေနှင့် လေ့လာမည်</button>
+
+      <div class="fine-print">Account မရှိသေးဘူးလား? <span class="link" data-target="register-form">Register</span></div>
+    </form>
+
+    <form id="register-form">
+      <div class="field">
+        <label for="ru">Username</label>
+        <input type="text" id="ru" placeholder="choose a username">
+      </div>
+      <div class="field">
+        <label for="re">Email</label>
+        <input type="email" id="re" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="rp">Password</label>
+        <input type="password" id="rp" placeholder="••••••••">
+      </div>
+      <div class="field">
+        <label for="rp2">Confirm password</label>
+        <input type="password" id="rp2" placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn-primary">Create account</button>
+      <div class="fine-print">Account ရှိပြီးသားလား? <span class="link" data-target="login-form">Login</span></div>
+    </form>
+
+  </div>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab, .link[data-target]');
+  const forms = document.querySelectorAll('form');
+
+  function showForm(id){
+    forms.forEach(f => f.classList.toggle('active', f.id === id));
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.target === id));
+  }
+
+  tabs.forEach(el => el.addEventListener('click', () => showForm(el.dataset.target)));
+
+  forms.forEach(f => f.addEventListener('submit', e => {
+    e.preventDefault();
+    // Hook this up to your real auth backend / API.
+    alert('Connect this form to your backend to enable real login/register.');
+  }));
+
+  document.getElementById('guest-btn').addEventListener('click', () => {
+    // Hook this up to your guest-session logic.
+    alert('Connect this to a guest-session flow when ready.');
+  });
+</script>
+
+</body>
+</html>

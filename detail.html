@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Details - TelePlay</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 15px; }
+    .container { max-width: 700px; margin: 0 auto; }
+    
+    .back-btn {
+      display: inline-block; background: #1e293b; color: #f59e0b;
+      padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold;
+      cursor: pointer; text-decoration: none; margin-bottom: 20px; border: 1px solid #334155;
+    }
+    
+    .detail-card { background: #1e293b; border-radius: 10px; overflow: hidden; padding: 15px; border: 1px solid #334155; }
+    
+    .poster-container { text-align: center; margin-bottom: 15px; }
+    .poster-container img { max-width: 100%; max-height: 350px; border-radius: 8px; object-fit: cover; }
+    
+    .movie-title { font-size: 22px; font-weight: bold; color: #f59e0b; margin-bottom: 8px; }
+    .badge { display: inline-block; background: #f59e0b; color: #000; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-right: 6px; text-transform: uppercase; }
+    .category { font-size: 13px; color: #94a3b8; margin-bottom: 15px; }
+    
+    .desc-box { background: #0f172a; padding: 12px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #334155; font-size: 13px; line-height: 1.6; color: #cbd5e1; white-space: pre-wrap; }
+    
+    .download-btn {
+      display: block; text-align: center; background: #22c55e; color: #fff;
+      font-weight: bold; padding: 12px; border-radius: 6px; text-decoration: none;
+      font-size: 15px; transition: background 0.2s;
+    }
+    .download-btn:hover { background: #16a34a; }
+    
+    #status { text-align: center; margin-top: 50px; color: #f59e0b; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <a href="index.html" class="back-btn">← Back to Home</a>
+    
+    <div id="status">Loading movie details...</div>
+    
+    <div id="movie-detail" class="detail-card" style="display: none;">
+      <div class="poster-container">
+        <img id="poster" src="" alt="Movie Poster">
+      </div>
+      
+      <div class="movie-title" id="title"></div>
+      
+      <div class="category">
+        <span class="badge" id="quality"></span>
+        <span id="type-cat"></span>
+      </div>
+      
+      <h3>Description (ဇာတ်လမ်းအညွှန်း)</h3>
+      <div class="desc-box" id="description">အညွှန်းမရှိပါ။</div>
+      
+      <a id="telegram-link" href="#" target="_blank" class="download-btn">🚀 Watch on Telegram (ကြည့်ရှုရန်)</a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://boiqvzakfztlujjdiyhm.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_9nHwP9SRRzgpxxslQ-gB6w_hT2Y-noa';
+
+    async function loadMovieDetail() {
+      const statusDiv = document.getElementById('status');
+      const detailDiv = document.getElementById('movie-detail');
+
+      // URL ထဲမှ movie id ကို ယူခြင်း
+      const urlParams = new URLSearchParams(window.location.search);
+      const movieId = urlParams.get('id');
+
+      if (!movieId) {
+        statusDiv.innerText = '❌ ဇာတ်ကား ID မတွေ့ရှိပါ။';
+        return;
+      }
+
+      if (!window.supabase) {
+        statusDiv.innerText = '❌ Supabase SDK load မဖြစ်ပါ။';
+        return;
+      }
+
+      const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const { data, error } = await sbClient.from('movies').select('*').eq('id', movieId).single();
+
+      if (error || !data) {
+        statusDiv.innerText = '❌ ဇာတ်ကား အချက်အလက် ရှာမတွေ့ပါ။';
+        return;
+      }
+
+      // UI တွင် အချက်အလက်များ ထည့်သွင်းခြင်း
+      document.getElementById('poster').src = data.poster_url || '';
+      document.getElementById('title').innerText = data.title || 'Untitled';
+      document.getElementById('quality').innerText = data.quality || '1080p';
+      document.getElementById('type-cat').innerText = (data.type || 'Movie') + ' • ' + (data.category || 'General');
+      
+      // Description ပြသခြင်း
+      if (data.description && data.description.trim() !== '') {
+        document.getElementById('description').innerText = data.description;
+      }
+
+      // Telegram Link ချိတ်ပေးခြင်း
+      const tgBtn = document.getElementById('telegram-link');
+      if (data.telegram_link) {
+        tgBtn.href = data.telegram_link;
+      } else {
+        tgBtn.style.display = 'none';
+      }
+
+      statusDiv.style.display = 'none';
+      detailDiv.style.display = 'block';
+    }
+
+    window.addEventListener('DOMContentLoaded', loadMovieDetail);
+  </script>
+</body>
+</html>

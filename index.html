@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TelePlay - Home</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 12px; }
+    
+    header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 20px; 
+      flex-wrap: wrap; 
+      gap: 10px;
+    }
+    h1 { color: #f59e0b; margin: 0; font-size: 22px; cursor: pointer; }
+    
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-box input {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 6px 10px 6px 28px;
+      border-radius: 20px;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+      transition: all 0.2s;
+      width: 150px;
+    }
+    .search-box input:focus {
+      border-color: #f59e0b;
+      width: 180px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 8px;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #f8fafc;
+      border-left: 3px solid #f59e0b;
+      padding-left: 6px;
+    }
+    .view-all-btn {
+      color: #f59e0b;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .view-all-btn:hover {
+      text-decoration: underline;
+    }
+
+    .back-btn {
+      display: inline-block;
+      background: #1e293b;
+      color: #f59e0b;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 15px;
+      border: 1px solid #334155;
+    }
+
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 8px; 
+    }
+
+    @media (min-width: 768px) {
+      body { padding: 20px; }
+      h1 { font-size: 24px; }
+      .grid { 
+        grid-template-columns: repeat(6, 1fr); 
+        gap: 16px; 
+      }
+      .search-box input { width: 220px; font-size: 13px; padding: 8px 12px 8px 32px; }
+      .search-box input:focus { width: 260px; }
+      .search-icon { left: 10px; font-size: 14px; }
+      .section-title { font-size: 18px; }
+      .view-all-btn { font-size: 13px; }
+    }
+
+    .card { 
+      background: #1e293b; 
+      border-radius: 6px; 
+      overflow: hidden; 
+      text-decoration: none; 
+      color: #fff; 
+      display: block; 
+      transition: transform 0.2s; 
+    }
+    .card:hover { transform: translateY(-3px); }
+    
+    .poster-box { position: relative; width: 100%; height: 160px; background: #334155; }
+    @media (min-width: 768px) {
+      .poster-box { height: 220px; }
+    }
+    .poster-box img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .badge-quality {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(245, 158, 11, 0.9);
+      color: #000;
+      font-size: 9px;
+      font-weight: bold;
+      padding: 2px 4px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .card-info { padding: 6px; }
+    .card-title { font-weight: bold; font-size: 11px; margin-bottom: 2px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-cat { font-size: 9px; color: #94a3b8; }
+    
+    @media (min-width: 768px) {
+      .card-info { padding: 8px; }
+      .card-title { font-size: 13px; margin-bottom: 3px; }
+      .card-cat { font-size: 11px; }
+      .badge-quality { font-size: 10px; top: 6px; right: 6px; padding: 2px 5px; }
+    }
+
+    #status { text-align: center; padding: 30px; color: #f59e0b; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 onclick="showHomeView()">TelePlay</h1>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search movies..." onkeyup="filterMovies()">
+    </div>
+  </header>
+
+  <div id="status">Loading updates...</div>
+
+  <div id="home-view" style="display: none;">
+    <div class="section-header">
+      <div class="section-title">Latest Updates</div>
+      <span class="view-all-btn" onclick="showViewAll('latest')">View All ›</span>
+    </div>
+    <div id="latest-grid" class="grid"></div>
+
+    <div class="section-header">
+      <div class="section-title">Movies</div>
+      <span class="view-all-btn" onclick="showViewAll('movies')">View All ›</span>
+    </div>
+    <div id="movies-grid" class="grid"></div>
+
+    <div class="section-header">
+      <div class="section-title">Series</div>
+      <span class="view-all-btn" onclick="showViewAll('series')">View All ›</span>
+    </div>
+    <div id="series-grid" class="grid"></div>
+  </div>
+
+  <div id="view-all-page" style="display: none;">
+    <div class="back-btn" onclick="showHomeView()">← Back to Home</div>
+    <div class="section-header" style="margin-top: 0;">
+      <div class="section-title" id="view-all-title">All Items</div>
+    </div>
+    <div id="view-all-grid" class="grid"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://boiqvzakfztlujjdiyhm.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_9nHwP9SRRzgpxxslQ-gB6w_hT2Y-noa';
+
+    const DEFAULT_POSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="230" viewBox="0 0 160 230"><rect width="100%" height="100%" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="14">No Image</text></svg>';
+
+    let allMoviesData = [];
+
+    async function loadData() {
+      const statusDiv = document.getElementById('status');
+      
+      if (!window.supabase) {
+        statusDiv.innerText = '❌ Supabase SDK load မဖြစ်ပါ။';
+        return;
+      }
+
+      const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const { data, error } = await sbClient.from('movies').select('*').order('id', { ascending: false });
+
+      if (error) {
+        statusDiv.innerText = '❌ Error: ' + error.message;
+        return;
+      }
+
+      allMoviesData = data || [];
+      
+      if (allMoviesData.length === 0) {
+        statusDiv.innerText = 'မည့်သည့် ရုပ်ရှင်မျှ မရှိသေးပါ။';
+        return;
+      }
+
+      statusDiv.style.display = 'none';
+      showHomeView();
+    }
+
+    function createMovieCard(movie) {
+      const card = document.createElement('a');
+      card.className = 'card';
+      card.href = 'detail.html?id=' + movie.id;
+
+      const posterBox = document.createElement('div');
+      posterBox.className = 'poster-box';
+
+      const img = document.createElement('img');
+      img.src = movie.poster_url || DEFAULT_POSTER;
+      img.onerror = function() { this.src = DEFAULT_POSTER; };
+
+      const badge = document.createElement('div');
+      badge.className = 'badge-quality';
+      badge.innerText = movie.quality || '1080p';
+
+      posterBox.appendChild(img);
+      posterBox.appendChild(badge);
+
+      const info = document.createElement('div');
+      info.className = 'card-info';
+
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.innerText = movie.title || 'Untitled';
+
+      const cat = document.createElement('div');
+      cat.className = 'card-cat';
+      cat.innerText = movie.category || 'Movie';
+
+      info.appendChild(title);
+      info.appendChild(cat);
+      card.appendChild(posterBox);
+      card.appendChild(info);
+
+      return card;
+    }
+
+    function showHomeView() {
+      document.getElementById('view-all-page').style.display = 'none';
+      document.getElementById('home-view').style.display = 'block';
+
+      const limit = 6;
+
+      const latestGrid = document.getElementById('latest-grid');
+      latestGrid.innerHTML = '';
+      allMoviesData.slice(0, limit).forEach(m => latestGrid.appendChild(createMovieCard(m)));
+const moviesGrid = document.getElementById('movies-grid');
+      moviesGrid.innerHTML = '';
+      const moviesOnly = allMoviesData.filter(m => !m.type || m.type === 'Movie');
+      moviesOnly.slice(0, limit).forEach(m => moviesGrid.appendChild(createMovieCard(m)));
+
+      const seriesGrid = document.getElementById('series-grid');
+      seriesGrid.innerHTML = '';
+      const seriesOnly = allMoviesData.filter(m => m.type === 'Series');
+      seriesOnly.slice(0, limit).forEach(m => seriesGrid.appendChild(createMovieCard(m)));
+    }
+
+    function showViewAll(category) {
+      document.getElementById('home-view').style.display = 'none';
+      document.getElementById('view-all-page').style.display = 'block';
+
+      const grid = document.getElementById('view-all-grid');
+      const title = document.getElementById('view-all-title');
+      grid.innerHTML = '';
+
+      let listToDisplay = [];
+
+      if (category === 'latest') {
+        title.innerText = 'All Latest Updates';
+        listToDisplay = allMoviesData;
+      } else if (category === 'movies') {
+        title.innerText = 'All Movies';
+        listToDisplay = allMoviesData.filter(m => !m.type || m.type === 'Movie');
+      } else if (category === 'series') {
+        title.innerText = 'All Series';
+        listToDisplay = allMoviesData.filter(m => m.type === 'Series');
+      }
+
+      listToDisplay.forEach(m => grid.appendChild(createMovieCard(m)));
+    }
+
+    function filterMovies() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      if (!query) {
+        showHomeView();
+        return;
+      }
+
+      document.getElementById('home-view').style.display = 'none';
+      document.getElementById('view-all-page').style.display = 'block';
+
+      const title = document.getElementById('view-all-title');
+      title.innerText = 'Search Results for: "' + query + '"';
+
+      const grid = document.getElementById('view-all-grid');
+      grid.innerHTML = '';
+
+      const filtered = allMoviesData.filter(m => 
+        (m.title && m.title.toLowerCase().includes(query)) || 
+        (m.category && m.category.toLowerCase().includes(query))
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 30px;">ရှာဖွေမှုနှင့် ကိုက်ညီသော ရုပ်ရှင် မတွေ့ရှိပါ။</div>';
+      } else {
+        filtered.forEach(m => grid.appendChild(createMovieCard(m)));
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>
