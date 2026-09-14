@@ -53,7 +53,7 @@
       <div class="row">
         <div>
           <label>Type *</label>
-          <select id="type" onchange="toggleTypeFields()">
+          <select id="type">
             <option value="Movie">Movie</option>
             <option value="Series">Series</option>
           </select>
@@ -88,14 +88,14 @@
       <div id="series-episodes-section" style="display: none; margin-top: 15px; border-top: 1px dashed #334155; padding-top: 10px;">
         <label style="color: #f59e0b; font-size: 15px;">📺 Series Episodes List</label>
         <div id="episodes-container"></div>
-        <button type="button" class="btn-add-ep" onclick="addEpisodeRow()">+ Add Episode</button>
+        <button type="button" id="add-ep-btn" class="btn-add-ep">+ Add Episode</button>
       </div>
 
       <label style="margin-top: 15px;">Description / Storyline</label>
       <textarea id="description" rows="3" placeholder="Enter storyline..."></textarea>
 
       <button type="submit" id="btn-submit">Save Item</button>
-      <button type="button" id="btn-cancel" class="btn-cancel" style="display:none;" onclick="resetForm()">Cancel Edit</button>
+      <button type="button" id="btn-cancel" class="btn-cancel" style="display:none;">Cancel Edit</button>
     </form>
   </div>
 
@@ -126,23 +126,7 @@
 
     let moviesList = [];
 
-    function toggleTypeFields() {
-      const type = document.getElementById('type').value;
-      const movieSection = document.getElementById('movie-link-section');
-      const seriesSection = document.getElementById('series-episodes-section');
-
-      if (type === 'Series') {
-        movieSection.style.display = 'none';
-        seriesSection.style.display = 'block';
-        if (document.querySelectorAll('.ep-row').length === 0) {
-          addEpisodeRow('S1 E01', '');
-        }
-      } else {
-        movieSection.style.display = 'block';
-        seriesSection.style.display = 'none';
-      }
-    }
-
+    // Episode Row ထည့်ပေးသည့် Function
     function addEpisodeRow(name = '', link = '') {
       const container = document.getElementById('episodes-container');
       const div = document.createElement('div');
@@ -150,9 +134,33 @@
       div.innerHTML = `
         <input type="text" placeholder="Ep Name (e.g. S1 E01)" value="${name}" style="width: 30%;" class="ep-name">
         <input type="url" placeholder="Telegram Link" value="${link}" style="width: 60%;" class="ep-link">
-        <button type="button" class="btn-remove-ep" onclick="this.parentElement.remove()">✕</button>
+        <button type="button" class="btn-remove-ep">✕</button>
       `;
+      
+      div.querySelector('.btn-remove-ep').addEventListener('click', function() {
+        div.remove();
+      });
+
       container.appendChild(div);
+    }
+
+    // Type ကို Series/Movie ပြောင်းလဲမှုကို ကြည့်ပေးသည့် Function
+    function toggleTypeFields() {
+      const type = document.getElementById('type').value;
+      const movieSection = document.getElementById('movie-link-section');
+      const seriesSection = document.getElementById('series-episodes-section');
+      const container = document.getElementById('episodes-container');
+
+      if (type === 'Series') {
+        movieSection.style.display = 'none';
+        seriesSection.style.display = 'block';
+        if (container.children.length === 0) {
+          addEpisodeRow('S1 E01', '');
+        }
+      } else {
+        movieSection.style.display = 'block';
+        seriesSection.style.display = 'none';
+      }
     }
 
     function getEpisodesData() {
@@ -289,7 +297,13 @@
       document.getElementById('btn-cancel').style.display = 'none';
     }
 
-    window.addEventListener('DOMContentLoaded', fetchMovies);
+    // Event Listener များ ချိတ်ဆက်ခြင်း
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchMovies();
+      document.getElementById('type').addEventListener('change', toggleTypeFields);
+      document.getElementById('add-ep-btn').addEventListener('click', () => addEpisodeRow());
+      document.getElementById('btn-cancel').addEventListener('click', resetForm);
+    });
   </script>
 </body>
 </html>
