@@ -65,8 +65,63 @@
     .movie-grid .movie-card { flex: none; width: 100%; max-width: none; }
 
     /* ==========================================
-       FULL PAGE DETAIL VIEW (PAGE-LIKE EXPERIENCE)
+       FOOTER DESIGN (Matching Image)
        ========================================== */
+    .app-footer {
+      text-align: center;
+      padding: 30px 10px 20px 10px;
+      margin-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-sub);
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .footer-version {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #a1a1aa;
+    }
+
+    .footer-credit-title {
+      font-size: 12px;
+      color: #8E8E93;
+      margin-bottom: 6px;
+    }
+
+    .footer-credit-teams {
+      font-size: 13px;
+      font-weight: 700;
+      color: #E5E5EA;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .footer-made {
+      font-size: 13px;
+      color: #E5E5EA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .footer-made i {
+      color: #ef4444;
+    }
+
+    /* FULL PAGE DETAIL VIEW */
     #detail-page {
       display: none;
       min-height: 100vh;
@@ -177,7 +232,6 @@
       text-align: justify;
     }
 
-    /* Watch Section Box */
     .watch-section {
       background: rgba(0, 0, 0, 0.25);
       border: 1px solid var(--glass-border);
@@ -303,6 +357,18 @@
         </div>
         <div class="movie-grid" id="view-all-grid"></div>
       </div>
+
+      <!-- FOOTER SECTION -->
+      <footer class="app-footer">
+        <div class="footer-top">
+          <span>© 2026 TelePlay</span>
+          <span class="footer-version">v1.0</span>
+          <span>Made By YoungX & Claude Ai</span>
+        </div>
+        <div class="footer-credit-title">မူရင်း ဘာသာပြန်ပေးသော Team များကို Full Credit ပေးပါတယ်</div>
+        <div class="footer-credit-teams">CM | HomieTV | Bioscope</div>
+        <div class="footer-made">Made With <i class="fa-solid fa-heart"></i> in Myanmar</div>
+      </footer>
     </div>
 
     <!-- FULL PAGE DETAIL VIEW -->
@@ -367,7 +433,6 @@
 
     document.addEventListener('DOMContentLoaded', fetchMovies);
 
-    // ဖုန်းရဲ့ Hardware Back Button နှိပ်ရင် Home Page ကို ပြန်သွားနိုင်ရန်
     window.onpopstate = function(event) {
       if (event.state && event.state.page === 'detail') {
         renderDetailPage(event.state.id);
@@ -385,7 +450,6 @@
       rawMovies = data || [];
       renderHomeSections(rawMovies);
 
-      // URL မှာ movie id ပါမပါ စစ်ဆေးပြီး Detail Page ကို တိုက်ရိုက်ပွင့်ပေးခြင်း
       const urlParams = new URLSearchParams(window.location.search);
       const movieId = urlParams.get('id');
       if (movieId) {
@@ -423,7 +487,6 @@
       document.getElementById('container-series').innerHTML = seriesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No series</div>';
     }
 
-    /* Router Functions (Page Navigation Experience) */
     function openDetailPage(id, pushHistory = true) {
       if (pushHistory) {
         history.pushState({ page: 'detail', id: id }, '', `?id=${id}`);
