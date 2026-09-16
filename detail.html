@@ -14,7 +14,7 @@
       --bg-color: #0f172a;
       --card-bg: #1e293b;
       --accent-color: #f59e0b;
-      --telegram-btn: #0088cc !important;
+      --telegram-btn: #0088cc;
       --telegram-btn-hover: #0077b5;
       --text-color: #f8fafc;
       --text-sub: #94a3b8;
@@ -25,7 +25,7 @@
 
     /* Header & Search */
     header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #0b1120; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1e293b; }
-    .logo { font-size: 20px; font-weight: 800; color: var(--accent-color); text-decoration: none; }
+    .logo { font-size: 20px; font-weight: 800; color: var(--accent-color); text-decoration: none; cursor: pointer; }
     .search-box { position: relative; width: 55%; max-width: 250px; }
     .search-box input { width: 100%; padding: 7px 12px 7px 34px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; color: #fff; font-size: 13px; }
     .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 12px; }
@@ -47,7 +47,7 @@
     .view-all { font-size: 12px; color: var(--accent-color); text-decoration: none; cursor: pointer; font-weight: 600; }
     .view-all:hover { text-decoration: underline; }
 
-    /* Horizontal Poster Scroll */
+    /* Horizontal Poster Scroll (3 Items Visible on Mobile) */
     .poster-scroll-container { 
       display: flex; 
       gap: 10px; 
@@ -59,7 +59,7 @@
     }
     .poster-scroll-container::-webkit-scrollbar { display: none; }
 
-    /* Movie Card Design (3 posters per row on mobile) */
+    /* Movie Card Design */
     .movie-card { 
       flex: 0 0 calc(33.333% - 7px); 
       min-width: 105px;
@@ -86,57 +86,83 @@
     .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
     .movie-grid .movie-card { flex: none; width: 100%; max-width: none; }
 
-    /* Modal / Detail Pop-up Window */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 200; padding: 16px; }
-    .modal-content { background: var(--card-bg); width: 100%; max-width: 440px; max-height: 85vh; border-radius: 12px; overflow-y: auto; border: 1px solid #334155; position: relative; }
-    .close-modal { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; z-index: 20; font-size: 14px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-    
-    /* Responsive Modal Poster Wrapper */
-    .modal-poster-box { 
-      width: 100%; 
+    /* FULL PAGE DETAIL VIEW (MODAL မဟုတ်တော့ပါ) */
+    #detail-page {
+      display: none;
+      background: var(--bg-color);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    .detail-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent-color);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 12px;
+      background: #1e293b;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid #334155;
+    }
+
+    .detail-poster-wrapper {
+      width: 100%;
       background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
-      max-height: 280px;
-    }
-    .modal-poster-box img { 
-      width: 100%; 
-      height: auto; 
-      max-height: 280px;
-      object-fit: contain; 
+      border: 1px solid #334155;
+      max-height: 450px;
     }
 
-    .modal-body { padding: 16px; }
-    .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #fff; }
-    .modal-genres { font-size: 12px; color: var(--accent-color); margin-bottom: 10px; font-weight: 500; }
-    .modal-desc { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin-bottom: 16px; }
+    .detail-poster-wrapper img {
+      width: 100%;
+      height: auto;
+      max-height: 450px;
+      object-fit: contain;
+    }
 
-    /* Episode Selector for Series */
+    .detail-info-box {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #334155;
+    }
+
+    .detail-title { font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 6px; }
+    .detail-meta-tags { font-size: 13px; color: var(--accent-color); margin-bottom: 14px; font-weight: 500; }
+    .detail-description { font-size: 14px; color: var(--text-sub); line-height: 1.6; margin-bottom: 20px; white-space: pre-line; }
+
+    /* Blue Telegram Watch Button */
+    .btn-watch-telegram {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 10px !important;
+      width: 100% !important;
+      background-color: var(--telegram-btn) !important;
+      color: #ffffff !important;
+      padding: 14px !important;
+      border-radius: 8px !important;
+      font-size: 15px !important;
+      font-weight: 700 !important;
+      text-decoration: none !important;
+      box-shadow: 0 4px 14px rgba(0, 136, 204, 0.4) !important;
+      transition: background 0.2s !important;
+    }
+    .btn-watch-telegram:hover { background-color: var(--telegram-btn-hover) !important; }
+
+    /* Episode Selector List */
     .episodes-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-    .ep-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #fff; border: 1px solid #334155; font-size: 13px; transition: 0.2s; }
-    .ep-item:hover { border-color: #0088cc; color: #0088cc; }
-
-    /* Telegram Watch Button Color Fixed to Blue */
-    .btn-watch { 
-      display: flex !important; 
-      align-items: center !important; 
-      justify-content: center !important; 
-      gap: 8px !important; 
-      width: 100% !important; 
-      text-align: center !important; 
-      background-color: #0088cc !important; 
-      color: #ffffff !important; 
-      padding: 12px !important; 
-      border-radius: 8px !important; 
-      font-weight: 600 !important; 
-      text-decoration: none !important; 
-      margin-top: 12px !important; 
-      font-size: 14px !important; 
-      box-shadow: 0 4px 12px rgba(0, 136, 204, 0.4) !important;
-    }
-    .btn-watch:hover { background-color: #0077b5 !important; }
+    .ep-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 12px 16px; border-radius: 8px; text-decoration: none; color: #fff; border: 1px solid #334155; font-size: 14px; transition: 0.2s; }
+    .ep-item:hover { border-color: var(--telegram-btn); color: var(--telegram-btn); }
 
     /* Bottom Navigation Bar */
     .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0b1120; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
@@ -149,8 +175,7 @@
       .movie-grid { grid-template-columns: repeat(6, 1fr); }
       .bottom-nav { display: none; }
       body { padding-bottom: 0; }
-      .modal-poster-box { max-height: 350px; }
-      .modal-poster-box img { max-height: 350px; }
+      .detail-layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
     }
   </style>
 </head>
@@ -158,7 +183,7 @@
 
   <!-- Header -->
   <header>
-    <a href="#" class="logo" onclick="showHomePage()">TELEPLAY</a>
+    <a class="logo" onclick="showHomePage()">TELEPLAY</a>
     <div class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
       <input type="text" id="search-input" placeholder="Search..." onkeyup="handleSearch()">
@@ -167,59 +192,80 @@
 
   <div class="container">
     
-    <!-- Category / Genre Pills -->
-    <div class="categories-bar" id="category-bar">
-      <div class="cat-pill active" onclick="filterCategory('All', this)">All</div>
-      <div class="cat-pill" onclick="filterCategory('Action', this)">Action</div>
-      <div class="cat-pill" onclick="filterCategory('Drama', this)">Drama</div>
-      <div class="cat-pill" onclick="filterCategory('Comedy', this)">Comedy</div>
-      <div class="cat-pill" onclick="filterCategory('Romance', this)">Romance</div>
+    <!-- MAIN HOME PAGE VIEW -->
+    <div id="home-view">
+      <!-- Category / Genre Pills -->
+      <div class="categories-bar" id="category-bar">
+        <div class="cat-pill active" onclick="filterCategory('All', this)">All</div>
+        <div class="cat-pill" onclick="filterCategory('Action', this)">Action</div>
+        <div class="cat-pill" onclick="filterCategory('Drama', this)">Drama</div>
+        <div class="cat-pill" onclick="filterCategory('Comedy', this)">Comedy</div>
+        <div class="cat-pill" onclick="filterCategory('Romance', this)">Romance</div>
+      </div>
+
+      <!-- Main Content Area -->
+      <div id="main-sections">
+        <!-- SECTION 1: Latest Updates -->
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-title">Latest Updates</span>
+            <span class="section-count" id="count-latest">0</span>
+          </div>
+          <span class="view-all" onclick="showViewAll('latest')">View All ›</span>
+        </div>
+        <div class="poster-scroll-container" id="container-latest"></div>
+
+        <!-- SECTION 2: Movies -->
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-title">Movies</span>
+            <span class="section-count" id="count-movies">0</span>
+          </div>
+          <span class="view-all" onclick="showViewAll('Movie')">View All ›</span>
+        </div>
+        <div class="poster-scroll-container" id="container-movies"></div>
+
+        <!-- SECTION 3: Series -->
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-title">Series</span>
+            <span class="section-count" id="count-series">0</span>
+          </div>
+          <span class="view-all" onclick="showViewAll('Series')">View All ›</span>
+        </div>
+        <div class="poster-scroll-container" id="container-series"></div>
+      </div>
+
+      <!-- View All Container -->
+      <div id="view-all-page" style="display: none;">
+        <div class="section-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="view-all" onclick="showHomePage()"><i class="fa-solid fa-arrow-left"></i> Back</span>
+            <span class="section-title" id="view-all-title">All Items</span>
+          </div>
+        </div>
+        <div class="movie-grid" id="view-all-grid"></div>
+      </div>
     </div>
 
-    <!-- Main Content Area -->
-    <div id="main-sections">
-
-      <!-- SECTION 1: Latest Updates -->
-      <div class="section-header">
-        <div class="section-title-wrap">
-          <span class="section-title">Latest Updates</span>
-          <span class="section-count" id="count-latest">0</span>
-        </div>
-        <span class="view-all" onclick="showViewAll('latest')">View All ›</span>
+    <!-- FULL DETAIL PAGE VIEW (Separate Full-Screen Section) -->
+    <div id="detail-page">
+      <div class="detail-back-btn" onclick="showHomePage()">
+        <i class="fa-solid fa-arrow-left"></i> Back to Movies
       </div>
-      <div class="poster-scroll-container" id="container-latest"></div>
 
-      <!-- SECTION 2: Movies -->
-      <div class="section-header">
-        <div class="section-title-wrap">
-          <span class="section-title">Movies</span>
-          <span class="section-count" id="count-movies">0</span>
+      <div class="detail-layout">
+        <div class="detail-poster-wrapper">
+          <img id="detail-img" src="" alt="Poster">
         </div>
-        <span class="view-all" onclick="showViewAll('Movie')">View All ›</span>
-      </div>
-      <div class="poster-scroll-container" id="container-movies"></div>
 
-      <!-- SECTION 3: Series -->
-      <div class="section-header">
-        <div class="section-title-wrap">
-          <span class="section-title">Series</span>
-          <span class="section-count" id="count-series">0</span>
-        </div>
-        <span class="view-all" onclick="showViewAll('Series')">View All ›</span>
-      </div>
-      <div class="poster-scroll-container" id="container-series"></div>
-
-    </div>
-
-    <!-- View All Container -->
-    <div id="view-all-page" style="display: none;">
-      <div class="section-header">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="view-all" onclick="showHomePage()"><i class="fa-solid fa-arrow-left"></i> Back</span>
-          <span class="section-title" id="view-all-title">All Items</span>
+        <div class="detail-info-box">
+          <h1 class="detail-title" id="detail-title"></h1>
+          <div class="detail-meta-tags" id="detail-meta"></div>
+          <div class="detail-description" id="detail-desc"></div>
+          <div id="detail-actions"></div>
         </div>
       </div>
-      <div class="movie-grid" id="view-all-grid"></div>
     </div>
 
   </div>
@@ -239,22 +285,6 @@
       <span>Series</span>
     </div>
   </nav>
-
-  <!-- Movie Details Modal -->
-  <div class="modal-overlay" id="movie-modal">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeModal()">✕</button>
-      <div class="modal-poster-box">
-        <img id="modal-img" src="" alt="Poster">
-      </div>
-      <div class="modal-body">
-        <div class="modal-title" id="modal-title"></div>
-        <div class="modal-genres" id="modal-meta"></div>
-        <div class="modal-desc" id="modal-desc"></div>
-        <div id="modal-actions"></div>
-      </div>
-    </div>
-  </div>
 
   <script>
     const SUPABASE_URL = 'https://boiqvzakfztlujjdiyhm.supabase.co';
@@ -277,7 +307,7 @@
 
     function createCardHTML(m) {
       return `
-        <div class="movie-card" onclick="openModal(${m.id})">
+        <div class="movie-card" onclick="openDetailPage(${m.id})">
           <div class="poster-wrapper">
             <span class="badge-type">${m.type || 'Movie'}</span>
             <span class="badge-rating">⭐ ${m.rating || 'N/A'}</span>
@@ -306,8 +336,10 @@
     }
 
     function showViewAll(type) {
+      document.getElementById('home-view').style.display = 'block';
       document.getElementById('main-sections').style.display = 'none';
       document.getElementById('view-all-page').style.display = 'block';
+      document.getElementById('detail-page').style.display = 'none';
 
       let filtered = [];
       let title = "All Items";
@@ -329,9 +361,12 @@
     }
 
     function showHomePage() {
+      document.getElementById('home-view').style.display = 'block';
       document.getElementById('main-sections').style.display = 'block';
       document.getElementById('view-all-page').style.display = 'none';
+      document.getElementById('detail-page').style.display = 'none';
       document.getElementById('search-input').value = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function filterCategory(cat, el) {
@@ -352,47 +387,53 @@
         showHomePage();
         return;
       }
+      document.getElementById('home-view').style.display = 'block';
       document.getElementById('main-sections').style.display = 'none';
       document.getElementById('view-all-page').style.display = 'block';
+      document.getElementById('detail-page').style.display = 'none';
       
       const filtered = rawMovies.filter(m => m.title.toLowerCase().includes(query));
       document.getElementById('view-all-title').innerText = `Search Results (${filtered.length})`;
       document.getElementById('view-all-grid').innerHTML = filtered.map(m => createCardHTML(m)).join('') || '<div style="grid-column: 1/-1; text-align:center; color:var(--text-sub); padding:20px;">No results found.</div>';
     }
 
-    function openModal(id) {
+    /* FULL DETAIL PAGE OPEN FUNCTION */
+    function openDetailPage(id) {
       const m = rawMovies.find(item => item.id === id);
       if (!m) return;
 
-      document.getElementById('modal-img').src = m.poster_url;
-      document.getElementById('modal-title').innerText = m.title;
-      document.getElementById('modal-meta').innerText = `${m.type || 'Movie'} • ⭐ ${m.rating || 'N/A'} • ${m.category || ''}`;
-      document.getElementById('modal-desc').innerText = m.description || 'No storyline available.';
+      document.getElementById('detail-img').src = m.poster_url;
+      document.getElementById('detail-title').innerText = m.title;
+      document.getElementById('detail-meta').innerText = `${m.type || 'Movie'} • ⭐ ${m.rating || 'N/A'} • ${m.category || ''}`;
+      document.getElementById('detail-desc').innerText = m.description || 'No storyline available.';
 
-      const actionSec = document.getElementById('modal-actions');
+      const actionSec = document.getElementById('detail-actions');
       actionSec.innerHTML = '';
 
       if (m.type === 'Series' && m.episodes && m.episodes.length > 0) {
-        let epHTML = `<div style="font-weight:bold; margin-bottom:6px; font-size:12px; color:var(--accent-color);">Select Episode:</div><div class="episodes-list">`;
+        let epHTML = `<div style="font-weight:bold; margin-bottom:8px; font-size:14px; color:var(--accent-color);">Select Episode:</div><div class="episodes-list">`;
         m.episodes.forEach(ep => {
           epHTML += `
             <a href="${ep.link}" target="_blank" class="ep-item">
-              <span><i class="fa-solid fa-play" style="font-size:11px; margin-right:6px;"></i> ${ep.title}</span>
-              <i class="fa-solid fa-paper-plane" style="color:#0088cc;"></i>
+              <span><i class="fa-solid fa-play" style="font-size:12px; margin-right:8px;"></i> ${ep.title}</span>
+              <i class="fa-solid fa-paper-plane" style="color:var(--telegram-btn);"></i>
             </a>
           `;
         });
         epHTML += `</div>`;
         actionSec.innerHTML = epHTML;
       } else {
-        actionSec.innerHTML = `<a href="${m.telegram_link || '#'}" target="_blank" class="btn-watch"><i class="fa-brands fa-telegram" style="font-size:18px;"></i> Watch on Telegram</a>`;
+        actionSec.innerHTML = `
+          <a href="${m.telegram_link || '#'}" target="_blank" class="btn-watch-telegram">
+            <i class="fa-brands fa-telegram" style="font-size:20px;"></i> Watch on Telegram
+          </a>
+        `;
       }
 
-      document.getElementById('movie-modal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('movie-modal').style.display = 'none';
+      // Hide Home & Show Detail Page
+      document.getElementById('home-view').style.display = 'none';
+      document.getElementById('detail-page').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   </script>
 </body>
