@@ -3,92 +3,257 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TelePlay - Details</title>
+  <title>TelePlay - Stream & Watch</title>
+  <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 15px; }
-
-    .header-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .back-btn { text-decoration: none; color: #f59e0b; font-size: 14px; font-weight: bold; background: #1e293b; padding: 6px 14px; border-radius: 6px; border: 1px solid #334155; }
-    
-    .detail-container { max-width: 800px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 16px; border: 1px solid #334155; }
-    
-    .main-info { display: flex; gap: 16px; flex-direction: column; }
-    
-    @media (min-width: 600px) {
-      .main-info { flex-direction: row; }
-      .poster-wrap { width: 220px; flex-shrink: 0; }
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #f59e0b;
+      --telegram-btn: #0088cc;
+      --telegram-btn-hover: #0077b5;
+      --text-color: #f8fafc;
+      --text-sub: #94a3b8;
     }
 
-    .poster-wrap { position: relative; width: 100%; aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; background: #0f172a; }
-    .poster-wrap img { width: 100%; height: 100%; object-fit: cover; }
-    
-    .badge-q { position: absolute; top: 8px; right: 8px; background: #f59e0b; color: #000; font-weight: bold; font-size: 10px; padding: 3px 6px; border-radius: 4px; }
-    .badge-r { position: absolute; top: 8px; left: 8px; background: rgba(15, 23, 42, 0.9); color: #f59e0b; font-weight: bold; font-size: 10px; padding: 3px 6px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.4); }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-color); padding-bottom: 75px; }
 
-    .info-wrap { flex-grow: 1; display: flex; flex-direction: column; }
-    .movie-title { font-size: 22px; font-weight: bold; color: #fff; margin: 0 0 8px 0; }
-    
-    .meta-tags { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-    .tag { background: #0f172a; border: 1px solid #334155; color: #94a3b8; font-size: 11px; padding: 4px 8px; border-radius: 4px; }
-    
-    .desc-title { font-size: 14px; font-weight: bold; color: #f59e0b; margin-top: 10px; }
-    .desc-text { font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-top: 5px; }
+    /* Header & Search */
+    header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #0b1120; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1e293b; }
+    .logo { font-size: 20px; font-weight: 800; color: var(--accent-color); text-decoration: none; }
+    .search-box { position: relative; width: 55%; max-width: 250px; }
+    .search-box input { width: 100%; padding: 7px 12px 7px 34px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; color: #fff; font-size: 13px; }
+    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 12px; }
 
-    /* Single Movie Button */
-    .btn-watch-main { display: block; background: #f59e0b; color: #000; text-align: center; text-decoration: none; font-weight: bold; padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 15px; }
-    .btn-watch-main:hover { background: #d97706; }
+    /* Container */
+    .container { padding: 16px 12px; max-width: 1200px; margin: 0 auto; }
 
-    /* Series Episode Section */
-    .episodes-section { margin-top: 25px; border-top: 1px solid #334155; padding-top: 15px; }
-    .episodes-title { font-size: 16px; font-weight: bold; color: #f59e0b; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    /* Category / Genre Pills */
+    .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
+    .categories-bar::-webkit-scrollbar { display: none; }
+    .cat-pill { padding: 5px 14px; background: #1e293b; border: 1px solid #334155; border-radius: 20px; font-size: 12px; color: var(--text-sub); cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .cat-pill.active, .cat-pill:hover { background: var(--accent-color); color: #000; font-weight: bold; border-color: var(--accent-color); }
+
+    /* Section Headers */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 10px; }
+    .section-title-wrap { display: flex; align-items: center; gap: 8px; }
+    .section-title { font-size: 15px; font-weight: 700; color: #fff; }
+    .section-count { font-size: 11px; background: #334155; color: var(--accent-color); padding: 2px 7px; border-radius: 10px; font-weight: bold; }
+    .view-all { font-size: 12px; color: var(--accent-color); text-decoration: none; cursor: pointer; font-weight: 600; }
+    .view-all:hover { text-decoration: underline; }
+
+    /* Horizontal Poster Scroll */
+    .poster-scroll-container { 
+      display: flex; 
+      gap: 10px; 
+      overflow-x: auto; 
+      padding-bottom: 12px; 
+      margin-bottom: 16px; 
+      scrollbar-width: none; 
+      scroll-snap-type: x mandatory;
+    }
+    .poster-scroll-container::-webkit-scrollbar { display: none; }
+
+    /* Movie Card Design (3 posters per row on mobile) */
+    .movie-card { 
+      flex: 0 0 calc(33.333% - 7px); 
+      min-width: 105px;
+      max-width: 140px;
+      background: var(--card-bg); 
+      border-radius: 8px; 
+      overflow: hidden; 
+      cursor: pointer; 
+      transition: transform 0.2s; 
+      border: 1px solid #334155; 
+      scroll-snap-align: start;
+    }
+    .movie-card:hover { transform: translateY(-3px); }
+    .poster-wrapper { position: relative; aspect-ratio: 2/3; width: 100%; background: #1e293b; }
+    .poster-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+    .badge-type { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.75); padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: bold; color: var(--accent-color); backdrop-filter: blur(2px); }
+    .badge-rating { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.75); padding: 1px 5px; border-radius: 3px; font-size: 9px; color: #f59e0b; backdrop-filter: blur(2px); }
     
-    .episodes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-    .ep-card { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px; text-decoration: none; color: #fff; text-align: center; font-size: 13px; font-weight: bold; transition: all 0.2s; }
-    .ep-card:hover { border-color: #f59e0b; color: #f59e0b; transform: translateY(-2px); }
+    .movie-info { padding: 6px; }
+    .movie-title { font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .movie-meta { font-size: 10px; color: var(--text-sub); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    #loading { text-align: center; padding: 50px; color: #f59e0b; }
+    /* Grid View for "View All" Mode */
+    .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+    .movie-grid .movie-card { flex: none; width: 100%; max-width: none; }
+
+    /* Modal / Detail Pop-up Window */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 200; padding: 16px; }
+    .modal-content { background: var(--card-bg); width: 100%; max-width: 440px; max-height: 85vh; border-radius: 12px; overflow-y: auto; border: 1px solid #334155; position: relative; }
+    .close-modal { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 10; font-size: 14px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    
+    /* Optimized Modal Poster for Mobile View */
+    .modal-hero { 
+      width: 100%; 
+      height: 250px; 
+      background-size: contain; 
+      background-repeat: no-repeat;
+      background-position: center; 
+      background-color: #0b1120;
+      position: relative; 
+    }
+    .modal-hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background: linear-gradient(to top, var(--card-bg), transparent);
+    }
+
+    .modal-body { padding: 16px; }
+    .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 4px; color: #fff; }
+    .modal-genres { font-size: 12px; color: var(--accent-color); margin-bottom: 10px; font-weight: 500; }
+    .modal-desc { font-size: 13px; color: var(--text-sub); line-height: 1.5; margin-bottom: 16px; }
+
+    /* Episode Selector for Series */
+    .episodes-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .ep-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #fff; border: 1px solid #334155; font-size: 13px; transition: 0.2s; }
+    .ep-item:hover { border-color: var(--telegram-btn); color: var(--telegram-btn); }
+
+    /* Telegram Watch Button Color Updated to Blue */
+    .btn-watch { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px; 
+      width: 100%; 
+      text-align: center; 
+      background: var(--telegram-btn); 
+      color: #ffffff; 
+      padding: 12px; 
+      border-radius: 8px; 
+      font-weight: 600; 
+      text-decoration: none; 
+      margin-top: 12px; 
+      font-size: 14px; 
+      transition: background 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
+    }
+    .btn-watch:hover { background: var(--telegram-btn-hover); }
+
+    /* Bottom Navigation Bar (Mobile View) */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0b1120; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; font-size: 10px; gap: 3px; cursor: pointer; }
+    .nav-item.active, .nav-item:hover { color: var(--accent-color); }
+    .nav-item i { font-size: 15px; }
+
+    @media (min-width: 768px) {
+      .movie-card { flex: 0 0 calc(16.666% - 9px); min-width: 140px; }
+      .movie-grid { grid-template-columns: repeat(6, 1fr); }
+      .bottom-nav { display: none; }
+      body { padding-bottom: 0; }
+      .modal-hero { height: 300px; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="header-nav">
-    <a href="index.html" class="back-btn">← Back</a>
-  </div>
+  <!-- Header -->
+  <header>
+    <a href="#" class="logo" onclick="showHomePage()">TELEPLAY</a>
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="search-input" placeholder="Search..." onkeyup="handleSearch()">
+    </div>
+  </header>
 
-  <div id="loading">Loading details...</div>
-
-  <div id="content" class="detail-container" style="display: none;">
-    <div class="main-info">
-      <div class="poster-wrap">
-        <img id="poster" src="" alt="Poster">
-        <div class="badge-q" id="quality">1080p</div>
-        <div class="badge-r" id="rating">⭐ 8.0</div>
-      </div>
-      <div class="info-wrap">
-        <h1 class="movie-title" id="title">Movie Title</h1>
-        
-        <div class="meta-tags">
-          <span class="tag" id="type-tag">Movie</span>
-          <span class="tag" id="category-tag">Action</span>
-        </div>
-
-        <div class="desc-title">Storyline</div>
-        <div class="desc-text" id="description">No description available.</div>
-
-        <!-- Movie Single Link Button -->
-        <a id="movie-watch-btn" href="#" target="_blank" class="btn-watch-main" style="display: none;">▶ Stream / Download Movie</a>
-      </div>
+  <div class="container">
+    
+    <!-- Category / Genre Pills -->
+    <div class="categories-bar" id="category-bar">
+      <div class="cat-pill active" onclick="filterCategory('All', this)">All</div>
+      <div class="cat-pill" onclick="filterCategory('Action', this)">Action</div>
+      <div class="cat-pill" onclick="filterCategory('Drama', this)">Drama</div>
+      <div class="cat-pill" onclick="filterCategory('Comedy', this)">Comedy</div>
+      <div class="cat-pill" onclick="filterCategory('Romance', this)">Romance</div>
     </div>
 
-    <!-- Series Episodes Grid -->
-    <div id="series-episodes-block" class="episodes-section" style="display: none;">
-      <div class="episodes-title">
-        <span>📺 Select Episode</span>
-        <span style="font-size: 12px; color: #94a3b8;" id="ep-count">0 Episodes</span>
+    <!-- Main Content Area -->
+    <div id="main-sections">
+
+      <!-- SECTION 1: Latest Updates -->
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-title">Latest Updates</span>
+          <span class="section-count" id="count-latest">0</span>
+        </div>
+        <span class="view-all" onclick="showViewAll('latest')">View All ›</span>
       </div>
-      <div class="episodes-grid" id="episodes-grid"></div>
+      <div class="poster-scroll-container" id="container-latest"></div>
+
+      <!-- SECTION 2: Movies -->
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-title">Movies</span>
+          <span class="section-count" id="count-movies">0</span>
+        </div>
+        <span class="view-all" onclick="showViewAll('Movie')">View All ›</span>
+      </div>
+      <div class="poster-scroll-container" id="container-movies"></div>
+
+      <!-- SECTION 3: Series -->
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-title">Series</span>
+          <span class="section-count" id="count-series">0</span>
+        </div>
+        <span class="view-all" onclick="showViewAll('Series')">View All ›</span>
+      </div>
+      <div class="poster-scroll-container" id="container-series"></div>
+
+    </div>
+
+    <!-- View All / Search Output Grid Container -->
+    <div id="view-all-page" style="display: none;">
+      <div class="section-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="view-all" onclick="showHomePage()"><i class="fa-solid fa-arrow-left"></i> Back</span>
+          <span class="section-title" id="view-all-title">All Items</span>
+        </div>
+      </div>
+      <div class="movie-grid" id="view-all-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Mobile Navigation -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="showHomePage()">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" onclick="showViewAll('Movie')">
+      <i class="fa-solid fa-film"></i>
+      <span>Movies</span>
+    </div>
+    <div class="nav-item" onclick="showViewAll('Series')">
+      <i class="fa-solid fa-tv"></i>
+      <span>Series</span>
+    </div>
+  </nav>
+
+  <!-- Movie Details Modal -->
+  <div class="modal-overlay" id="movie-modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()">✕</button>
+      <div class="modal-hero" id="modal-poster"></div>
+      <div class="modal-body">
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-genres" id="modal-meta"></div>
+        <div class="modal-desc" id="modal-desc"></div>
+        <div id="modal-actions"></div>
+      </div>
     </div>
   </div>
 
@@ -97,71 +262,145 @@
     const SUPABASE_KEY = 'sb_publishable_9nHwP9SRRzgpxxslQ-gB6w_hT2Y-noa';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const DEFAULT_POSTER = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="240" viewBox="0 0 160 240"><rect width="100%" height="100%" fill="%23334155"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="14">No Image</text></svg>';
+    let rawMovies = [];
 
-    async function loadDetail() {
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
+    document.addEventListener('DOMContentLoaded', fetchMovies);
 
-      if (!id) {
-        document.getElementById('loading').innerText = '❌ Invalid Movie ID!';
+    async function fetchMovies() {
+      const { data, error } = await sb.from('movies').select('*').order('id', { ascending: false });
+      if (error) {
+        console.error('Error fetching:', error.message);
         return;
       }
+      rawMovies = data || [];
+      renderHomeSections(rawMovies);
+    }
 
-      const { data: m, error } = await sb.from('movies').select('*').eq('id', id).single();
+    function createCardHTML(m) {
+      return `
+        <div class="movie-card" onclick="openModal(${m.id})">
+          <div class="poster-wrapper">
+            <span class="badge-type">${m.type || 'Movie'}</span>
+            <span class="badge-rating">⭐ ${m.rating || 'N/A'}</span>
+            <img src="${m.poster_url}" alt="${m.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225'">
+          </div>
+          <div class="movie-info">
+            <div class="movie-title">${m.title}</div>
+            <div class="movie-meta">${m.category || 'General'}</div>
+          </div>
+        </div>
+      `;
+    }
 
-      if (error || !m) {
-        document.getElementById('loading').innerText = '❌ Item not found!';
-        return;
+    function renderHomeSections(list) {
+      const latestList = list.slice(0, 6);
+      const moviesList = list.filter(m => m.type === 'Movie' || !m.type).slice(0, 6);
+      const seriesList = list.filter(m => m.type === 'Series').slice(0, 6);
+
+      // Counts
+      document.getElementById('count-latest').innerText = list.length;
+      document.getElementById('count-movies').innerText = list.filter(m => m.type === 'Movie' || !m.type).length;
+      document.getElementById('count-series').innerText = list.filter(m => m.type === 'Series').length;
+
+      // Render Containers
+      document.getElementById('container-latest').innerHTML = latestList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No updates</div>';
+      document.getElementById('container-movies').innerHTML = moviesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No movies</div>';
+      document.getElementById('container-series').innerHTML = seriesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No series</div>';
+    }
+
+    // View All Page
+    function showViewAll(type) {
+      document.getElementById('main-sections').style.display = 'none';
+      document.getElementById('view-all-page').style.display = 'block';
+
+      let filtered = [];
+      let title = "All Items";
+
+      if (type === 'latest') {
+        filtered = rawMovies;
+        title = "Latest Updates";
+      } else if (type === 'Movie') {
+        filtered = rawMovies.filter(m => m.type === 'Movie' || !m.type);
+        title = "Movies";
+      } else if (type === 'Series') {
+        filtered = rawMovies.filter(m => m.type === 'Series');
+        title = "Series";
       }
 
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('content').style.display = 'block';
+      document.getElementById('view-all-title').innerText = `${title} (${filtered.length})`;
+      document.getElementById('view-all-grid').innerHTML = filtered.map(m => createCardHTML(m)).join('');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-      document.title = m.title + ' - TelePlay';
-      document.getElementById('title').innerText = m.title || 'Untitled';
-      document.getElementById('poster').src = m.poster_url || DEFAULT_POSTER;
-      document.getElementById('poster').onerror = function() { this.src = DEFAULT_POSTER; };
-      
-      document.getElementById('quality').innerText = m.quality || '1080p';
-      document.getElementById('rating').innerText = '⭐ ' + (m.rating || 'N/A');
-      document.getElementById('type-tag').innerText = m.type || 'Movie';
-      document.getElementById('category-tag').innerText = m.category || 'General';
-      document.getElementById('description').innerText = m.description || 'No description provided.';
+    function showHomePage() {
+      document.getElementById('main-sections').style.display = 'block';
+      document.getElementById('view-all-page').style.display = 'none';
+      document.getElementById('search-input').value = '';
+    }
 
-      if (m.type === 'Series') {
-        // Show Series Episodes Grid
-        const epBlock = document.getElementById('series-episodes-block');
-        const epGrid = document.getElementById('episodes-grid');
-        const epCount = document.getElementById('ep-count');
-        
-        epBlock.style.display = 'block';
-        epGrid.innerHTML = '';
+    // Filter Categories
+    function filterCategory(cat, el) {
+      document.querySelectorAll('.cat-pill').forEach(pill => pill.classList.remove('active'));
+      el.classList.add('active');
 
-        const episodes = m.episodes || [];
-        epCount.innerText = episodes.length + ' Episodes';
-
-        if (episodes.length === 0) {
-          epGrid.innerHTML = '<div style="grid-column: 1/-1; color: #94a3b8;">No episodes uploaded yet.</div>';
-        } else {
-          episodes.forEach(ep => {
-            const btn = document.createElement('a');
-            btn.className = 'ep-card';
-            btn.href = ep.link;
-            btn.target = '_blank';
-            btn.innerText = ep.title;
-            epGrid.appendChild(btn);
-          });
-        }
+      if (cat === 'All') {
+        renderHomeSections(rawMovies);
       } else {
-        // Show Movie Watch Button
-        const watchBtn = document.getElementById('movie-watch-btn');
-        watchBtn.style.display = 'block';
-        watchBtn.href = m.telegram_link || '#';
+        const filtered = rawMovies.filter(m => m.category && m.category.toLowerCase().includes(cat.toLowerCase()));
+        renderHomeSections(filtered);
       }
     }
 
-    window.addEventListener('DOMContentLoaded', loadDetail);
+    // Live Search
+    function handleSearch() {
+      const query = document.getElementById('search-input').value.toLowerCase().trim();
+      if (!query) {
+        showHomePage();
+        return;
+      }
+      document.getElementById('main-sections').style.display = 'none';
+      document.getElementById('view-all-page').style.display = 'block';
+      
+      const filtered = rawMovies.filter(m => m.title.toLowerCase().includes(query));
+      document.getElementById('view-all-title').innerText = `Search Results (${filtered.length})`;
+      document.getElementById('view-all-grid').innerHTML = filtered.map(m => createCardHTML(m)).join('') || '<div style="grid-column: 1/-1; text-align:center; color:var(--text-sub); padding:20px;">No results found.</div>';
+    }
+
+    // Modal Details Window
+    function openModal(id) {
+      const m = rawMovies.find(item => item.id === id);
+      if (!m) return;
+
+      document.getElementById('modal-poster').style.backgroundImage = `url('${m.poster_url}')`;
+      document.getElementById('modal-title').innerText = m.title;
+      document.getElementById('modal-meta').innerText = `${m.type || 'Movie'} • ⭐ ${m.rating || 'N/A'} • ${m.category || ''}`;
+      document.getElementById('modal-desc').innerText = m.description || 'No storyline available.';
+
+      const actionSec = document.getElementById('modal-actions');
+      actionSec.innerHTML = '';
+
+      if (m.type === 'Series' && m.episodes && m.episodes.length > 0) {
+        let epHTML = `<div style="font-weight:bold; margin-bottom:6px; font-size:12px; color:var(--accent-color);">Select Episode:</div><div class="episodes-list">`;
+        m.episodes.forEach(ep => {
+          epHTML += `
+            <a href="${ep.link}" target="_blank" class="ep-item">
+              <span><i class="fa-solid fa-play" style="font-size:11px; margin-right:6px;"></i> ${ep.title}</span>
+              <i class="fa-solid fa-paper-plane" style="color:var(--telegram-btn);"></i>
+            </a>
+          `;
+        });
+        epHTML += `</div>`;
+        actionSec.innerHTML = epHTML;
+      } else {
+        actionSec.innerHTML = `<a href="${m.telegram_link || '#'}" target="_blank" class="btn-watch"><i class="fa-brands fa-telegram" style="font-size:18px;"></i> Watch on Telegram</a>`;
+      }
+
+      document.getElementById('movie-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('movie-modal').style.display = 'none';
+    }
   </script>
 </body>
 </html>
