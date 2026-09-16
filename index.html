@@ -41,17 +41,22 @@
     .cat-pill.active, .cat-pill:hover { background: var(--accent-red); color: #fff; font-weight: bold; border-color: var(--accent-red); }
 
     /* Section Headers */
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 10px 0; }
     .section-title-wrap { display: flex; align-items: center; gap: 8px; }
     .section-title { font-size: 15px; font-weight: 700; color: #fff; }
     .section-count { font-size: 11px; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); padding: 2px 7px; border-radius: 10px; font-weight: bold; }
     .view-all { font-size: 12px; color: var(--accent-red); text-decoration: none; cursor: pointer; font-weight: 600; }
 
-    .poster-scroll-container { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 16px; scrollbar-width: none; }
-    .poster-scroll-container::-webkit-scrollbar { display: none; }
+    /* Section Grid: 3 Columns, 2 Rows (6 posters) */
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
     /* Movie Cards */
-    .movie-card { flex: 0 0 calc(33.333% - 7px); min-width: 105px; max-width: 140px; background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--glass-border); transition: transform 0.2s; }
+    .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--glass-border); transition: transform 0.2s; }
     .movie-card:hover { transform: translateY(-3px); }
     .poster-wrapper { position: relative; aspect-ratio: 2/3; width: 100%; background: #1a1d24; }
     .poster-wrapper img { width: 100%; height: 100%; object-fit: cover; }
@@ -59,14 +64,11 @@
     .badge-rating { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px; font-size: 9px; color: var(--accent-gold); }
     .movie-info { padding: 8px; }
     .movie-title { font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .movie-meta { font-size: 10px; color: var(--text-sub); margin-top: 2px; }
+    .movie-meta { font-size: 10px; color: var(--text-sub); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
-    .movie-grid .movie-card { flex: none; width: 100%; max-width: none; }
 
-    /* ==========================================
-       FOOTER DESIGN (Matching Image)
-       ========================================== */
+    /* FOOTER DESIGN */
     .app-footer {
       text-align: center;
       padding: 30px 10px 20px 10px;
@@ -121,7 +123,7 @@
       color: #ef4444;
     }
 
-    /* FULL PAGE DETAIL VIEW */
+    /* DETAIL VIEW */
     #detail-page {
       display: none;
       min-height: 100vh;
@@ -133,154 +135,25 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .detail-top-bar {
-      display: flex;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .btn-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      background: var(--card-bg);
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid var(--glass-border);
-    }
-
-    .detail-card {
-      background: var(--card-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    .detail-banner-wrapper {
-      position: relative;
-      width: 100%;
-      height: 230px;
-      overflow: hidden;
-    }
-
-    .detail-banner-bg {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: blur(16px) brightness(0.35);
-      transform: scale(1.2);
-    }
-
-    .detail-poster-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(to bottom, rgba(11,13,16,0.1), var(--bg-color));
-    }
-
-    .detail-poster-img {
-      height: 175px;
-      aspect-ratio: 2/3;
-      border-radius: 10px;
-      object-fit: cover;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.8);
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-
-    .detail-content {
-      padding: 16px;
-    }
-
-    .detail-title {
-      font-size: 20px;
-      font-weight: 800;
-      color: #fff;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
-    .detail-tags {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .tag-badge {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--glass-border);
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 11px;
-      color: var(--text-sub);
-    }
-
+    .detail-top-bar { display: flex; align-items: center; margin-bottom: 16px; }
+    .btn-back { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--card-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border); }
+    .detail-card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .detail-banner-wrapper { position: relative; width: 100%; height: 230px; overflow: hidden; }
+    .detail-banner-bg { width: 100%; height: 100%; object-fit: cover; filter: blur(16px) brightness(0.35); transform: scale(1.2); }
+    .detail-poster-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(to bottom, rgba(11,13,16,0.1), var(--bg-color)); }
+    .detail-poster-img { height: 175px; aspect-ratio: 2/3; border-radius: 10px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); }
+    .detail-content { padding: 16px; }
+    .detail-title { font-size: 20px; font-weight: 800; color: #fff; text-align: center; margin-bottom: 12px; }
+    .detail-tags { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
+    .tag-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 4px 12px; border-radius: 12px; font-size: 11px; color: var(--text-sub); }
     .tag-badge.gold { color: var(--accent-gold); font-weight: bold; }
-
-    .detail-description {
-      font-size: 13px;
-      color: #cbd5e1;
-      line-height: 1.6;
-      margin-bottom: 20px;
-      text-align: justify;
-    }
-
-    .watch-section {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      padding: 14px;
-    }
-
-    .watch-section-title {
-      font-size: 11px;
-      font-weight: bold;
-      color: var(--accent-red);
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-telegram {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      background: var(--telegram-blue);
-      color: #fff;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-
+    .detail-description { font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px; text-align: justify; }
+    .watch-section { background: rgba(0, 0, 0, 0.25); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px; }
+    .watch-section-title { font-size: 11px; font-weight: bold; color: var(--accent-red); text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .btn-telegram { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: var(--telegram-blue); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; transition: opacity 0.2s; }
     .btn-telegram:hover { opacity: 0.9; }
-
     .ep-list { display: flex; flex-direction: column; gap: 8px; }
-    .ep-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--glass-border);
-      padding: 10px 12px;
-      border-radius: 6px;
-      color: #fff;
-      text-decoration: none;
-      font-size: 12px;
-    }
+    .ep-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 10px 12px; border-radius: 6px; color: #fff; text-decoration: none; font-size: 12px; }
 
     /* Bottom Nav */
     .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(11, 13, 16, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
@@ -289,7 +162,7 @@
     .nav-item i { font-size: 15px; }
 
     @media (min-width: 768px) {
-      .movie-card { flex: 0 0 calc(16.666% - 9px); min-width: 140px; }
+      .section-grid { grid-template-columns: repeat(6, 1fr); }
       .movie-grid { grid-template-columns: repeat(6, 1fr); }
       .bottom-nav { display: none; }
       body { padding-bottom: 0; }
@@ -320,6 +193,7 @@
       </div>
 
       <div id="main-sections">
+        <!-- Latest Updates Section -->
         <div class="section-header">
           <div class="section-title-wrap">
             <span class="section-title">Latest Updates</span>
@@ -327,8 +201,9 @@
           </div>
           <span class="view-all" onclick="showViewAll('latest')">View All ›</span>
         </div>
-        <div class="poster-scroll-container" id="container-latest"></div>
+        <div class="section-grid" id="container-latest"></div>
 
+        <!-- Movies Section -->
         <div class="section-header">
           <div class="section-title-wrap">
             <span class="section-title">Movies</span>
@@ -336,8 +211,9 @@
           </div>
           <span class="view-all" onclick="showViewAll('Movie')">View All ›</span>
         </div>
-        <div class="poster-scroll-container" id="container-movies"></div>
+        <div class="section-grid" id="container-movies"></div>
 
+        <!-- Series Section -->
         <div class="section-header">
           <div class="section-title-wrap">
             <span class="section-title">Series</span>
@@ -345,7 +221,7 @@
           </div>
           <span class="view-all" onclick="showViewAll('Series')">View All ›</span>
         </div>
-        <div class="poster-scroll-container" id="container-series"></div>
+        <div class="section-grid" id="container-series"></div>
       </div>
 
       <div id="view-all-page" style="display: none;">
@@ -474,6 +350,7 @@
     }
 
     function renderHomeSections(list) {
+      // 2 Rows, 3 Columns = Exact 6 items
       const latestList = list.slice(0, 6);
       const moviesList = list.filter(m => m.type === 'Movie' || !m.type).slice(0, 6);
       const seriesList = list.filter(m => m.type === 'Series').slice(0, 6);
@@ -482,9 +359,9 @@
       document.getElementById('count-movies').innerText = list.filter(m => m.type === 'Movie' || !m.type).length;
       document.getElementById('count-series').innerText = list.filter(m => m.type === 'Series').length;
 
-      document.getElementById('container-latest').innerHTML = latestList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No updates</div>';
-      document.getElementById('container-movies').innerHTML = moviesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No movies</div>';
-      document.getElementById('container-series').innerHTML = seriesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No series</div>';
+      document.getElementById('container-latest').innerHTML = latestList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px; grid-column:1/-1;">No updates</div>';
+      document.getElementById('container-movies').innerHTML = moviesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px; grid-column:1/-1;">No movies</div>';
+      document.getElementById('container-series').innerHTML = seriesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px; grid-column:1/-1;">No series</div>';
     }
 
     function openDetailPage(id, pushHistory = true) {
