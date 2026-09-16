@@ -14,7 +14,7 @@
       --bg-color: #0f172a;
       --card-bg: #1e293b;
       --accent-color: #f59e0b;
-      --telegram-btn: #0088cc;
+      --telegram-btn: #0088cc !important;
       --telegram-btn-hover: #0077b5;
       --text-color: #f8fafc;
       --text-sub: #94a3b8;
@@ -89,26 +89,23 @@
     /* Modal / Detail Pop-up Window */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 200; padding: 16px; }
     .modal-content { background: var(--card-bg); width: 100%; max-width: 440px; max-height: 85vh; border-radius: 12px; overflow-y: auto; border: 1px solid #334155; position: relative; }
-    .close-modal { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 10; font-size: 14px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    .close-modal { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; z-index: 20; font-size: 14px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
     
-    /* Optimized Modal Poster for Mobile View */
-    .modal-hero { 
+    /* Responsive Modal Poster Wrapper */
+    .modal-poster-box { 
       width: 100%; 
-      height: 250px; 
-      background-size: contain; 
-      background-repeat: no-repeat;
-      background-position: center; 
-      background-color: #0b1120;
-      position: relative; 
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      max-height: 280px;
     }
-    .modal-hero::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background: linear-gradient(to top, var(--card-bg), transparent);
+    .modal-poster-box img { 
+      width: 100%; 
+      height: auto; 
+      max-height: 280px;
+      object-fit: contain; 
     }
 
     .modal-body { padding: 16px; }
@@ -119,30 +116,29 @@
     /* Episode Selector for Series */
     .episodes-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
     .ep-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #fff; border: 1px solid #334155; font-size: 13px; transition: 0.2s; }
-    .ep-item:hover { border-color: var(--telegram-btn); color: var(--telegram-btn); }
+    .ep-item:hover { border-color: #0088cc; color: #0088cc; }
 
-    /* Telegram Watch Button Color Updated to Blue */
+    /* Telegram Watch Button Color Fixed to Blue */
     .btn-watch { 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 8px; 
-      width: 100%; 
-      text-align: center; 
-      background: var(--telegram-btn); 
-      color: #ffffff; 
-      padding: 12px; 
-      border-radius: 8px; 
-      font-weight: 600; 
-      text-decoration: none; 
-      margin-top: 12px; 
-      font-size: 14px; 
-      transition: background 0.2s;
-      box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
+      display: flex !important; 
+      align-items: center !important; 
+      justify-content: center !important; 
+      gap: 8px !important; 
+      width: 100% !important; 
+      text-align: center !important; 
+      background-color: #0088cc !important; 
+      color: #ffffff !important; 
+      padding: 12px !important; 
+      border-radius: 8px !important; 
+      font-weight: 600 !important; 
+      text-decoration: none !important; 
+      margin-top: 12px !important; 
+      font-size: 14px !important; 
+      box-shadow: 0 4px 12px rgba(0, 136, 204, 0.4) !important;
     }
-    .btn-watch:hover { background: var(--telegram-btn-hover); }
+    .btn-watch:hover { background-color: #0077b5 !important; }
 
-    /* Bottom Navigation Bar (Mobile View) */
+    /* Bottom Navigation Bar */
     .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0b1120; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
     .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; font-size: 10px; gap: 3px; cursor: pointer; }
     .nav-item.active, .nav-item:hover { color: var(--accent-color); }
@@ -153,7 +149,8 @@
       .movie-grid { grid-template-columns: repeat(6, 1fr); }
       .bottom-nav { display: none; }
       body { padding-bottom: 0; }
-      .modal-hero { height: 300px; }
+      .modal-poster-box { max-height: 350px; }
+      .modal-poster-box img { max-height: 350px; }
     }
   </style>
 </head>
@@ -214,7 +211,7 @@
 
     </div>
 
-    <!-- View All / Search Output Grid Container -->
+    <!-- View All Container -->
     <div id="view-all-page" style="display: none;">
       <div class="section-header">
         <div style="display: flex; align-items: center; gap: 8px;">
@@ -247,7 +244,9 @@
   <div class="modal-overlay" id="movie-modal">
     <div class="modal-content">
       <button class="close-modal" onclick="closeModal()">✕</button>
-      <div class="modal-hero" id="modal-poster"></div>
+      <div class="modal-poster-box">
+        <img id="modal-img" src="" alt="Poster">
+      </div>
       <div class="modal-body">
         <div class="modal-title" id="modal-title"></div>
         <div class="modal-genres" id="modal-meta"></div>
@@ -297,18 +296,15 @@
       const moviesList = list.filter(m => m.type === 'Movie' || !m.type).slice(0, 6);
       const seriesList = list.filter(m => m.type === 'Series').slice(0, 6);
 
-      // Counts
       document.getElementById('count-latest').innerText = list.length;
       document.getElementById('count-movies').innerText = list.filter(m => m.type === 'Movie' || !m.type).length;
       document.getElementById('count-series').innerText = list.filter(m => m.type === 'Series').length;
 
-      // Render Containers
       document.getElementById('container-latest').innerHTML = latestList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No updates</div>';
       document.getElementById('container-movies').innerHTML = moviesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No movies</div>';
       document.getElementById('container-series').innerHTML = seriesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px;">No series</div>';
     }
 
-    // View All Page
     function showViewAll(type) {
       document.getElementById('main-sections').style.display = 'none';
       document.getElementById('view-all-page').style.display = 'block';
@@ -338,7 +334,6 @@
       document.getElementById('search-input').value = '';
     }
 
-    // Filter Categories
     function filterCategory(cat, el) {
       document.querySelectorAll('.cat-pill').forEach(pill => pill.classList.remove('active'));
       el.classList.add('active');
@@ -351,7 +346,6 @@
       }
     }
 
-    // Live Search
     function handleSearch() {
       const query = document.getElementById('search-input').value.toLowerCase().trim();
       if (!query) {
@@ -366,12 +360,11 @@
       document.getElementById('view-all-grid').innerHTML = filtered.map(m => createCardHTML(m)).join('') || '<div style="grid-column: 1/-1; text-align:center; color:var(--text-sub); padding:20px;">No results found.</div>';
     }
 
-    // Modal Details Window
     function openModal(id) {
       const m = rawMovies.find(item => item.id === id);
       if (!m) return;
 
-      document.getElementById('modal-poster').style.backgroundImage = `url('${m.poster_url}')`;
+      document.getElementById('modal-img').src = m.poster_url;
       document.getElementById('modal-title').innerText = m.title;
       document.getElementById('modal-meta').innerText = `${m.type || 'Movie'} • ⭐ ${m.rating || 'N/A'} • ${m.category || ''}`;
       document.getElementById('modal-desc').innerText = m.description || 'No storyline available.';
@@ -385,7 +378,7 @@
           epHTML += `
             <a href="${ep.link}" target="_blank" class="ep-item">
               <span><i class="fa-solid fa-play" style="font-size:11px; margin-right:6px;"></i> ${ep.title}</span>
-              <i class="fa-solid fa-paper-plane" style="color:var(--telegram-btn);"></i>
+              <i class="fa-solid fa-paper-plane" style="color:#0088cc;"></i>
             </a>
           `;
         });
