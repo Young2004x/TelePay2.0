@@ -60,8 +60,11 @@
     .movie-card:hover { transform: translateY(-3px); }
     .poster-wrapper { position: relative; aspect-ratio: 2/3; width: 100%; background: #1a1d24; }
     .poster-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-    .badge-type { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; color: var(--accent-red); }
+    
+    /* Quality Badge Design */
+    .badge-quality { position: absolute; top: 4px; left: 4px; background: rgba(239, 68, 68, 0.9); padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 0.3px; }
     .badge-rating { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px; font-size: 9px; color: var(--accent-gold); }
+    
     .movie-info { padding: 8px; }
     .movie-title { font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .movie-meta { font-size: 10px; color: var(--text-sub); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -334,10 +337,13 @@
     }
 
     function createCardHTML(m) {
+      // Supabase မှာ quality သီးသန့်မရှိရင် Default '1080p' လို့ ပြပေးမယ်
+      const displayQuality = m.quality || '1080p';
+
       return `
         <div class="movie-card" onclick="openDetailPage(${m.id})">
           <div class="poster-wrapper">
-            <span class="badge-type">${m.type || 'Movie'}</span>
+            <span class="badge-quality">${displayQuality}</span>
             <span class="badge-rating">⭐ ${m.rating || 'N/A'}</span>
             <img src="${m.poster_url}" alt="${m.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/150x225'">
           </div>
@@ -350,7 +356,6 @@
     }
 
     function renderHomeSections(list) {
-      // 2 Rows, 3 Columns = Exact 6 items
       const latestList = list.slice(0, 6);
       const moviesList = list.filter(m => m.type === 'Movie' || !m.type).slice(0, 6);
       const seriesList = list.filter(m => m.type === 'Series').slice(0, 6);
