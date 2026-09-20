@@ -13,6 +13,7 @@
       --glass-border: rgba(255, 255, 255, 0.08);
       --accent-red: #ef4444;
       --accent-green: #22c55e;
+      --accent-blue: #3b82f6;
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
     }
@@ -51,8 +52,46 @@
       outline: none;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--accent-red); }
-    textarea { resize: vertical; min-height: 80px; }
+    textarea { resize: vertical; min-height: 70px; }
     
+    /* Episode Manager Box (Series Only) */
+    .episodes-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 10px;
+    }
+    .ep-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    .ep-row input { flex: 1; }
+    .btn-remove-ep {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--accent-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn-add-ep {
+      background: rgba(59, 130, 246, 0.2);
+      color: var(--accent-blue);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Buttons */
     .btn-submit {
       background: var(--accent-red);
       color: #fff;
@@ -97,6 +136,7 @@
 
     @media (max-width: 600px) {
       .form-grid { grid-template-columns: 1fr; }
+      .ep-row { flex-direction: column; }
     }
   </style>
 </head>
@@ -105,21 +145,21 @@
   <div class="admin-container">
     <h1><i class="fa-solid fa-clapperboard"></i> TelePlay Admin Dashboard</h1>
 
-    <!-- 1. Add / Edit Movie Form (မူရင်း တင်သည့် Form) -->
+    <!-- Add / Edit Form -->
     <div class="form-card">
-      <h2 id="form-title"> Add New Movie / Series</h2>
+      <h2 id="form-title">➕ Add New Content</h2>
       <form id="movie-form" onsubmit="handleFormSubmit(event)">
         <input type="hidden" id="movie-id">
         
         <div class="form-grid">
           <div class="form-group full">
-            <label>Movie Title</label>
-            <input type="text" id="title" placeholder="ဥပမာ - Bad Genius (2026)" required>
+            <label>Title</label>
+            <input type="text" id="title" placeholder="ဥပမာ - Flex X Cop" required>
           </div>
 
           <div class="form-group">
             <label>Type</label>
-            <select id="type" onchange="toggleEpisodeField()">
+            <select id="type" onchange="toggleTypeFields()">
               <option value="Movie">Movie</option>
               <option value="Series">Series</option>
             </select>
@@ -138,12 +178,12 @@
 
           <div class="form-group">
             <label>Rating (⭐)</label>
-            <input type="text" id="rating" placeholder="ဥပမာ - 7.5">
+            <input type="text" id="rating" placeholder="ဥပမာ - 8.5">
           </div>
 
           <div class="form-group">
             <label>Category / Genre</label>
-            <input type="text" id="category" placeholder="ဥပမာ - Action, Drama">
+            <input type="text" id="category" placeholder="ဥပမာ - Action, Comedy">
           </div>
 
           <div class="form-group full">
@@ -151,26 +191,38 @@
             <input type="url" id="poster_url" placeholder="https://..." required>
           </div>
 
-          <div class="form-group full" id="telegram-link-group">
-            <label>Telegram Link (For Movie)</label>
+          <!-- Telegram Link (For Movie Only) -->
+          <div class="form-group full" id="movie-link-group">
+            <label>Telegram Watch Link (For Movie)</label>
             <input type="url" id="telegram_link" placeholder="https://t.me/c/...">
+          </div>
+
+          <!-- Episode Manager Panel (For Series Only) -->
+          <div class="form-group full" id="series-episodes-group" style="display: none;">
+            <label style="color: var(--accent-blue); font-weight: bold;">📺 Series Episodes List</label>
+            <div class="episodes-box">
+              <div id="episodes-list-container"></div>
+              <button type="button" class="btn-add-ep" onclick="addEpisodeRow()">
+                <i class="fa-solid fa-plus"></i> Add Episode
+              </button>
+            </div>
           </div>
 
           <div class="form-group full">
             <label>Storyline Description</label>
-            <textarea id="description" placeholder="ရုပ်ရှင် အကျဉ်းချုပ် ရေးရန်..."></textarea>
+            <textarea id="description" placeholder="ရုပ်ရှင်/ဇာတ်လမ်းတွဲ အကျဉ်းချုပ်..."></textarea>
           </div>
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <button type="submit" class="btn-submit" id="btn-save" style="flex: 1;"> Save Movie</button>
+          <button type="submit" class="btn-submit" id="btn-save" style="flex: 1;">Save Content</button>
           <button type="button" class="btn-cancel" id="btn-cancel" onclick="resetForm()">Cancel Edit</button>
         </div>
       </form>
     </div>
 
-    <!-- 2. Search Box Section -->
-    <h2><i class="fa-solid fa-list"></i> Manage Uploaded Content</h2>
+    <!-- Search Box -->
+    <h2><i class="fa-solid fa-list"></i> Content List</h2>
     <div class="admin-search-wrapper">
       <i class="fa-solid fa-magnifying-glass"></i>
       <input 
@@ -182,7 +234,7 @@
       >
     </div>
 
-    <!-- 3. Movie Management Table -->
+    <!-- Movie Management Table -->
     <div class="movie-table-card">
       <table>
         <thead>
@@ -194,9 +246,7 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="movie-table-body">
-          <!-- Data များ JavaScript ဖြင့် ပေါ်လာပါမည် -->
-        </tbody>
+        <tbody id="movie-table-body"></tbody>
       </table>
     </div>
 
@@ -211,7 +261,7 @@
 
     document.addEventListener('DOMContentLoaded', loadAdminMovies);
 
-    // 1. Supabase ထဲမှ Data များ ယူခြင်း
+    // 1. Supabase မှ Data ယူခြင်း
     async function loadAdminMovies() {
       const { data, error } = await sb.from('movies').select('*').order('id', { ascending: false });
       if (error) {
@@ -222,12 +272,12 @@
       renderAdminTable(allAdminMovies);
     }
 
-    // 2. Table ထဲသို့ Render လုပ်ခြင်း
+    // 2. Table Render
     function renderAdminTable(movies) {
       const tbody = document.getElementById('movie-table-body');
       
       if (movies.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-sub);">ရုပ်ရှင် ရှာမတွေ့ပါ။</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-sub);">မည်သည့် Data မျှ ရှာမတွေ့ပါ။</td></tr>`;
         return;
       }
 
@@ -257,29 +307,77 @@
       renderAdminTable(filtered);
     }
 
-    // 4. Add သို့မဟုတ် Update (Form Submit)
+    // 4. Type ပြောင်းသည့်အခါ UI ပြောင်းခြင်း (Movie vs Series)
+    function toggleTypeFields() {
+      const type = document.getElementById('type').value;
+      const movieGroup = document.getElementById('movie-link-group');
+      const seriesGroup = document.getElementById('series-episodes-group');
+
+      if (type === 'Series') {
+        movieGroup.style.display = 'none';
+        seriesGroup.style.display = 'block';
+        if (document.querySelectorAll('.ep-row').length === 0) {
+          addEpisodeRow('Episode 1', '');
+        }
+      } else {
+        movieGroup.style.display = 'block';
+        seriesGroup.style.display = 'none';
+      }
+    }
+
+    // 5. Dynamic Episode Rows ထည့်ခြင်း/ဖျက်ခြင်း
+    function addEpisodeRow(title = '', link = '') {
+      const container = document.getElementById('episodes-list-container');
+      const epIndex = container.children.length + 1;
+      const epTitle = title || `Episode ${epIndex}`;
+
+      const row = document.createElement('div');
+      row.className = 'ep-row';
+      row.innerHTML = `
+        <input type="text" class="ep-title" placeholder="Ep Title (ဥပမာ- S1 Ep 1)" value="${epTitle}">
+        <input type="url" class="ep-link" placeholder="Telegram Stream Link" value="${link}">
+        <button type="button" class="btn-remove-ep" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+      `;
+      container.appendChild(row);
+    }
+
+    // 6. Form Submit (Save / Update)
     async function handleFormSubmit(e) {
       e.preventDefault();
       
       const id = document.getElementById('movie-id').value;
+      const type = document.getElementById('type').value;
+
+      // Collect Episode Array for Series
+      let episodesArray = [];
+      if (type === 'Series') {
+        const epRows = document.querySelectorAll('.ep-row');
+        epRows.forEach(row => {
+          const epTitle = row.querySelector('.ep-title').value;
+          const epLink = row.querySelector('.ep-link').value;
+          if (epTitle && epLink) {
+            episodesArray.push({ title: epTitle, link: epLink });
+          }
+        });
+      }
+
       const payload = {
         title: document.getElementById('title').value,
-        type: document.getElementById('type').value,
+        type: type,
         quality: document.getElementById('quality').value,
         rating: document.getElementById('rating').value,
         category: document.getElementById('category').value,
         poster_url: document.getElementById('poster_url').value,
-        telegram_link: document.getElementById('telegram_link').value,
-        description: document.getElementById('description').value
+        description: document.getElementById('description').value,
+        telegram_link: type === 'Movie' ? document.getElementById('telegram_link').value : null,
+        episodes: type === 'Series' ? episodesArray : []
       };
 
       let error;
       if (id) {
-        // Edit Mode
         const res = await sb.from('movies').update(payload).eq('id', id);
         error = res.error;
       } else {
-        // Add New Mode
         const res = await sb.from('movies').insert([payload]);
         error = res.error;
       }
@@ -287,13 +385,13 @@
       if (error) {
         alert('Error: ' + error.message);
       } else {
-        alert(id ? 'Movie ပြင်ဆင်ပြီးပါပြီ!' : 'Movie အသစ် တင်ပြီးပါပြီ!');
+        alert(id ? 'ပြင်ဆင်ပြီးပါပြီ!' : 'အသစ် တင်ပြီးပါပြီ!');
         resetForm();
         loadAdminMovies();
       }
     }
 
-    // 5. Edit Button နှိပ်လိုက်လျှင် Form ထဲသို့ Data ပြန်ဖြည့်ပေးခြင်း
+    // 7. Edit Button နှိပ်လျှင် Data ပြန်ဖြည့်ပေးခြင်း
     function handleEdit(id) {
       const m = allAdminMovies.find(item => item.id === id);
       if (!m) return;
@@ -308,16 +406,25 @@
       document.getElementById('telegram_link').value = m.telegram_link || '';
       document.getElementById('description').value = m.description || '';
 
-      document.getElementById('form-title').innerText = "✏️ Edit Movie Details";
-      document.getElementById('btn-save').innerText = "Update Movie";
+      // Clear & Populate Episodes if Series
+      const epContainer = document.getElementById('episodes-list-container');
+      epContainer.innerHTML = '';
+      if (m.type === 'Series' && m.episodes && m.episodes.length > 0) {
+        m.episodes.forEach(ep => addEpisodeRow(ep.title, ep.link));
+      }
+
+      toggleTypeFields();
+
+      document.getElementById('form-title').innerText = "✏️ Edit Content Details";
+      document.getElementById('btn-save').innerText = "Update Content";
       document.getElementById('btn-cancel').style.display = "block";
       
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 6. Delete Function
+    // 8. Delete Function
     async function handleDelete(id) {
-      if (confirm('ဒီရုပ်ရှင်ကို ဖျက်ရန် သေချာပါသလား?')) {
+      if (confirm('ဒီ Content ကို ဖျက်ရန် သေချာပါသလား?')) {
         const { error } = await sb.from('movies').delete().eq('id', id);
         if (error) {
           alert('Delete မအောင်မြင်ပါ: ' + error.message);
@@ -327,13 +434,15 @@
       }
     }
 
-    // 7. Form ပြန်လည် ရှင်းလင်းခြင်း
+    // 9. Reset Form
     function resetForm() {
       document.getElementById('movie-form').reset();
       document.getElementById('movie-id').value = '';
-      document.getElementById('form-title').innerText = " Add New Movie / Series";
-      document.getElementById('btn-save').innerText = " Save Movie";
+      document.getElementById('episodes-list-container').innerHTML = '';
+      document.getElementById('form-title').innerText = "➕ Add New Content";
+      document.getElementById('btn-save').innerText = "Save Content";
       document.getElementById('btn-cancel').style.display = "none";
+      toggleTypeFields();
     }
   </script>
 </body>
