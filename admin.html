@@ -21,84 +21,168 @@
     body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; }
     .admin-container { max-width: 900px; margin: 0 auto; }
     
-    h1 { font-size: 22px; margin-bottom: 20px; color: var(--accent-red); }
+    h1 { font-size: 22px; margin-bottom: 20px; color: var(--accent-red); display: flex; align-items: center; gap: 10px; }
+    h2 { font-size: 16px; margin-bottom: 12px; color: #fff; }
 
-    /* Search Box Design */
-    .admin-search-wrapper {
-      position: relative;
-      margin-bottom: 16px;
-    }
-    .admin-search-wrapper i {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-sub);
-      font-size: 14px;
-    }
-    .admin-search-input {
-      width: 100%;
-      padding: 12px 14px 12px 40px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--glass-border);
-      border-radius: 10px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      transition: 0.2s;
-    }
-    .admin-search-input:focus {
-      border-color: var(--accent-red);
-    }
-
-    /* Movie List Table Design */
-    .movie-table-card {
+    /* Form Design */
+    .form-card {
       background: var(--card-bg);
       border: 1px solid var(--glass-border);
       border-radius: 12px;
-      overflow: hidden;
+      padding: 20px;
+      margin-bottom: 30px;
     }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; color: var(--text-sub); }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent-red); }
+    textarea { resize: vertical; min-height: 80px; }
+    
+    .btn-submit {
+      background: var(--accent-red);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.2s;
+    }
+    .btn-submit:hover { opacity: 0.9; }
+    .btn-cancel {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Search Box Design */
+    .admin-search-wrapper { position: relative; margin-bottom: 16px; }
+    .admin-search-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 14px; }
+    .admin-search-input { width: 100%; padding: 12px 14px 12px 40px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--glass-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
+    .admin-search-input:focus { border-color: var(--accent-red); }
+
+    /* Movie Table Design */
+    .movie-table-card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 12px; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th, td { padding: 12px 16px; border-bottom: 1px solid var(--glass-border); font-size: 13px; }
     th { background: rgba(255,255,255,0.03); color: var(--text-sub); font-weight: 600; }
-    tr:last-child td { border-bottom: none; }
+    .poster-td img { width: 36px; height: 50px; object-fit: cover; border-radius: 4px; }
     
-    .poster-td img { width: 40px; height: 56px; object-fit: cover; border-radius: 4px; }
-    
-    .btn-action {
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: none;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-right: 4px;
-      transition: 0.2s;
-    }
+    .btn-action { padding: 6px 12px; border-radius: 6px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; margin-right: 4px; }
     .btn-edit { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.3); }
-    .btn-edit:hover { background: var(--accent-green); color: #fff; }
     .btn-delete { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
-    .btn-delete:hover { background: var(--accent-red); color: #fff; }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
   <div class="admin-container">
-    <h1><i class="fa-solid fa-film"></i> Movie Management</h1>
+    <h1><i class="fa-solid fa-clapperboard"></i> TelePlay Admin Dashboard</h1>
 
-    <!-- Search Box -->
+    <!-- 1. Add / Edit Movie Form (မူရင်း တင်သည့် Form) -->
+    <div class="form-card">
+      <h2 id="form-title"> Add New Movie / Series</h2>
+      <form id="movie-form" onsubmit="handleFormSubmit(event)">
+        <input type="hidden" id="movie-id">
+        
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Movie Title</label>
+            <input type="text" id="title" placeholder="ဥပမာ - Bad Genius (2026)" required>
+          </div>
+
+          <div class="form-group">
+            <label>Type</label>
+            <select id="type" onchange="toggleEpisodeField()">
+              <option value="Movie">Movie</option>
+              <option value="Series">Series</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Quality Badge</label>
+            <select id="quality">
+              <option value="1080p">1080p</option>
+              <option value="720p">720p</option>
+              <option value="4K">4K</option>
+              <option value="WEB-DL">WEB-DL</option>
+              <option value="HD">HD</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Rating (⭐)</label>
+            <input type="text" id="rating" placeholder="ဥပမာ - 7.5">
+          </div>
+
+          <div class="form-group">
+            <label>Category / Genre</label>
+            <input type="text" id="category" placeholder="ဥပမာ - Action, Drama">
+          </div>
+
+          <div class="form-group full">
+            <label>Poster Image URL</label>
+            <input type="url" id="poster_url" placeholder="https://..." required>
+          </div>
+
+          <div class="form-group full" id="telegram-link-group">
+            <label>Telegram Link (For Movie)</label>
+            <input type="url" id="telegram_link" placeholder="https://t.me/c/...">
+          </div>
+
+          <div class="form-group full">
+            <label>Storyline Description</label>
+            <textarea id="description" placeholder="ရုပ်ရှင် အကျဉ်းချုပ် ရေးရန်..."></textarea>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" class="btn-submit" id="btn-save" style="flex: 1;"> Save Movie</button>
+          <button type="button" class="btn-cancel" id="btn-cancel" onclick="resetForm()">Cancel Edit</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 2. Search Box Section -->
+    <h2><i class="fa-solid fa-list"></i> Manage Uploaded Content</h2>
     <div class="admin-search-wrapper">
       <i class="fa-solid fa-magnifying-glass"></i>
       <input 
         type="text" 
         id="admin-search-input" 
         class="admin-search-input" 
-        placeholder="ရုပ်ရှင်အမည် သို့မဟုတ် Category ဖြင့် ရှာရန်..." 
+        placeholder="ရုပ်ရှင် အမည် သို့မဟုတ် Category ဖြင့် ရှာရန်..." 
         onkeyup="filterAdminMovies()"
       >
     </div>
 
-    <!-- Movie Table -->
+    <!-- 3. Movie Management Table -->
     <div class="movie-table-card">
       <table>
         <thead>
@@ -106,15 +190,16 @@
             <th>Poster</th>
             <th>Title</th>
             <th>Type</th>
-            <th>Category</th>
+            <th>Quality</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody id="movie-table-body">
-          <!-- Data တွေ JavaScript နဲ့ ရောက်လာပါမယ် -->
+          <!-- Data များ JavaScript ဖြင့် ပေါ်လာပါမည် -->
         </tbody>
       </table>
     </div>
+
   </div>
 
   <script>
@@ -126,18 +211,18 @@
 
     document.addEventListener('DOMContentLoaded', loadAdminMovies);
 
-    // Supabase ထဲမှ ရုပ်ရှင်များ ဆွဲယူခြင်း
+    // 1. Supabase ထဲမှ Data များ ယူခြင်း
     async function loadAdminMovies() {
       const { data, error } = await sb.from('movies').select('*').order('id', { ascending: false });
       if (error) {
-        console.error('Error fetching movies:', error.message);
+        console.error('Error fetching:', error.message);
         return;
       }
       allAdminMovies = data || [];
       renderAdminTable(allAdminMovies);
     }
 
-    // Table ထဲ Render လုပ်ပေးသည့် Function
+    // 2. Table ထဲသို့ Render လုပ်ခြင်း
     function renderAdminTable(movies) {
       const tbody = document.getElementById('movie-table-body');
       
@@ -149,11 +234,11 @@
       tbody.innerHTML = movies.map(m => `
         <tr>
           <td class="poster-td">
-            <img src="${m.poster_url}" onerror="this.src='https://via.placeholder.com/40x56'">
+            <img src="${m.poster_url}" onerror="this.src='https://via.placeholder.com/36x50'">
           </td>
           <td style="font-weight: 600; color: #fff;">${m.title}</td>
           <td><span style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius:4px; font-size:11px;">${m.type || 'Movie'}</span></td>
-          <td style="color: var(--text-sub);">${m.category || 'General'}</td>
+          <td style="color: var(--accent-red); font-weight: bold;">${m.quality || '1080p'}</td>
           <td>
             <button class="btn-action btn-edit" onclick="handleEdit(${m.id})"><i class="fa-solid fa-pen"></i> Edit</button>
             <button class="btn-action btn-delete" onclick="handleDelete(${m.id})"><i class="fa-solid fa-trash"></i> Delete</button>
@@ -162,37 +247,93 @@
       `).join('');
     }
 
-    // Search Box မှ စာရိုက်တိုင်း Filter လုပ်ပေးသည့် Function
+    // 3. Search Box Filter
     function filterAdminMovies() {
       const query = document.getElementById('admin-search-input').value.toLowerCase().trim();
-      
       const filtered = allAdminMovies.filter(m => {
-        const titleMatch = m.title && m.title.toLowerCase().includes(query);
-        const catMatch = m.category && m.category.toLowerCase().includes(query);
-        const typeMatch = m.type && m.type.toLowerCase().includes(query);
-        return titleMatch || catMatch || typeMatch;
+        return (m.title && m.title.toLowerCase().includes(query)) ||
+               (m.category && m.category.toLowerCase().includes(query));
       });
-
       renderAdminTable(filtered);
     }
 
-    // Edit Function
-    function handleEdit(id) {
-      const movie = allAdminMovies.find(m => m.id === id);
-      alert(`Edit လုပ်မည်: ${movie.title}\n(သင့် Admin Form ထဲသို့ Data များ ထည့်သွင်းပေးနိုင်ပါသည်)`);
+    // 4. Add သို့မဟုတ် Update (Form Submit)
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const id = document.getElementById('movie-id').value;
+      const payload = {
+        title: document.getElementById('title').value,
+        type: document.getElementById('type').value,
+        quality: document.getElementById('quality').value,
+        rating: document.getElementById('rating').value,
+        category: document.getElementById('category').value,
+        poster_url: document.getElementById('poster_url').value,
+        telegram_link: document.getElementById('telegram_link').value,
+        description: document.getElementById('description').value
+      };
+
+      let error;
+      if (id) {
+        // Edit Mode
+        const res = await sb.from('movies').update(payload).eq('id', id);
+        error = res.error;
+      } else {
+        // Add New Mode
+        const res = await sb.from('movies').insert([payload]);
+        error = res.error;
+      }
+
+      if (error) {
+        alert('Error: ' + error.message);
+      } else {
+        alert(id ? 'Movie ပြင်ဆင်ပြီးပါပြီ!' : 'Movie အသစ် တင်ပြီးပါပြီ!');
+        resetForm();
+        loadAdminMovies();
+      }
     }
 
-    // Delete Function
+    // 5. Edit Button နှိပ်လိုက်လျှင် Form ထဲသို့ Data ပြန်ဖြည့်ပေးခြင်း
+    function handleEdit(id) {
+      const m = allAdminMovies.find(item => item.id === id);
+      if (!m) return;
+
+      document.getElementById('movie-id').value = m.id;
+      document.getElementById('title').value = m.title || '';
+      document.getElementById('type').value = m.type || 'Movie';
+      document.getElementById('quality').value = m.quality || '1080p';
+      document.getElementById('rating').value = m.rating || '';
+      document.getElementById('category').value = m.category || '';
+      document.getElementById('poster_url').value = m.poster_url || '';
+      document.getElementById('telegram_link').value = m.telegram_link || '';
+      document.getElementById('description').value = m.description || '';
+
+      document.getElementById('form-title').innerText = "✏️ Edit Movie Details";
+      document.getElementById('btn-save').innerText = "Update Movie";
+      document.getElementById('btn-cancel').style.display = "block";
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 6. Delete Function
     async function handleDelete(id) {
       if (confirm('ဒီရုပ်ရှင်ကို ဖျက်ရန် သေချာပါသလား?')) {
         const { error } = await sb.from('movies').delete().eq('id', id);
         if (error) {
-          alert('Delete လုပ်ရတာ မအောင်မြင်ပါ: ' + error.message);
+          alert('Delete မအောင်မြင်ပါ: ' + error.message);
         } else {
-          alert('ဖျက်ပြီးပါပြီ!');
-          loadAdminMovies(); // Table ပြန် Refresh လုပ်မည်
+          loadAdminMovies();
         }
       }
+    }
+
+    // 7. Form ပြန်လည် ရှင်းလင်းခြင်း
+    function resetForm() {
+      document.getElementById('movie-form').reset();
+      document.getElementById('movie-id').value = '';
+      document.getElementById('form-title').innerText = " Add New Movie / Series";
+      document.getElementById('btn-save').innerText = " Save Movie";
+      document.getElementById('btn-cancel').style.display = "none";
     }
   </script>
 </body>
