@@ -3,122 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TelePlay Admin Panel</title>
+  <title>TelePlay - Admin Panel</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #fff; padding: 20px; max-width: 800px; margin: 0 auto; }
-    h1 { color: #f59e0b; font-size: 24px; margin-bottom: 20px; }
-    .card { background: #1e293b; padding: 24px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
-    h2 { color: #f59e0b; font-size: 18px; margin-top: 0; margin-bottom: 16px; }
-    label { display: block; margin-top: 12px; font-weight: bold; font-size: 13px; color: #cbd5e1; }
-    input, select, textarea { width: 100%; padding: 10px; margin-top: 6px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px; font-size: 14px; }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #f59e0b; }
-    .row { display: flex; gap: 12px; }
-    .row > div { flex: 1; }
+    :root {
+      --bg-color: #0b0d10;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --accent-red: #ef4444;
+      --accent-green: #22c55e;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+    }
 
-    /* Movie / Series Link Sections */
-    #movie-link-section { display: block; }
-    #series-episodes-section { display: none; background: #0f172a; padding: 16px; border-radius: 8px; border: 1px dashed #334155; margin-top: 16px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; }
+    .admin-container { max-width: 900px; margin: 0 auto; }
     
-    .ep-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
-    .ep-row input { margin-top: 0; }
-    .btn-add-ep { background: #10b981; color: #fff; border: none; padding: 8px 12px; font-size: 13px; border-radius: 6px; cursor: pointer; width: auto; margin-top: 10px; font-weight: bold; }
-    .btn-remove-ep { background: #ef4444; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    h1 { font-size: 22px; margin-bottom: 20px; color: var(--accent-red); }
 
-    button[type="submit"] { background: #f59e0b; color: #000; font-weight: bold; border: none; padding: 12px; margin-top: 20px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 15px; }
-    button[type="submit"]:hover { background: #d97706; }
-    .btn-cancel { background: #475569; color: #fff; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 8px; }
+    /* Search Box Design */
+    .admin-search-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .admin-search-wrapper i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sub);
+      font-size: 14px;
+    }
+    .admin-search-input {
+      width: 100%;
+      padding: 12px 14px 12px 40px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: 0.2s;
+    }
+    .admin-search-input:focus {
+      border-color: var(--accent-red);
+    }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-    th, td { padding: 10px; border-bottom: 1px solid #334155; text-align: left; }
-    th { color: #f59e0b; }
-    .action-btn { padding: 4px 8px; font-size: 12px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; margin-right: 4px; }
-    .btn-edit { background: #3b82f6; color: #fff; }
-    .btn-delete { background: #ef4444; color: #fff; }
-    .poster-preview { width: 40px; height: 55px; object-fit: cover; border-radius: 4px; }
-    #msg { padding: 10px; margin-bottom: 15px; border-radius: 6px; display: none; font-weight: bold; }
-    .success { background: #166534; color: #fff; }
-    .error { background: #991b1b; color: #fff; }
+    /* Movie List Table Design */
+    .movie-table-card {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 12px 16px; border-bottom: 1px solid var(--glass-border); font-size: 13px; }
+    th { background: rgba(255,255,255,0.03); color: var(--text-sub); font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    
+    .poster-td img { width: 40px; height: 56px; object-fit: cover; border-radius: 4px; }
+    
+    .btn-action {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 4px;
+      transition: 0.2s;
+    }
+    .btn-edit { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.3); }
+    .btn-edit:hover { background: var(--accent-green); color: #fff; }
+    .btn-delete { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-delete:hover { background: var(--accent-red); color: #fff; }
   </style>
 </head>
 <body>
 
-  <h1>🎬 TelePlay Admin Panel</h1>
-  <div id="msg"></div>
+  <div class="admin-container">
+    <h1><i class="fa-solid fa-film"></i> Movie Management</h1>
 
-  <div class="card">
-    <h2 id="form-title">➕ Add New Movie/Series</h2>
-    <form id="movie-form">
-      <input type="hidden" id="movie-id">
-      
-      <label>Movie/Series Title *</label>
-      <input type="text" id="title" required placeholder="e.g. Moana 2">
+    <!-- Search Box -->
+    <div class="admin-search-wrapper">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input 
+        type="text" 
+        id="admin-search-input" 
+        class="admin-search-input" 
+        placeholder="ရုပ်ရှင်အမည် သို့မဟုတ် Category ဖြင့် ရှာရန်..." 
+        onkeyup="filterAdminMovies()"
+      >
+    </div>
 
-      <div class="row">
-        <div>
-          <label>Type *</label>
-          <select id="type" required>
-            <option value="Movie">Movie</option>
-            <option value="Series">Series</option>
-          </select>
-        </div>
-        <div>
-          <label>Category (Genre) *</label>
-          <input type="text" id="category" required placeholder="e.g. Action, Drama">
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label>Quality</label>
-          <input type="text" id="quality" placeholder="1080p" value="1080p">
-        </div>
-        <div>
-          <label>Rating ⭐</label>
-          <input type="text" id="rating" placeholder="8.0" value="8.0">
-        </div>
-      </div>
-
-      <label>Poster Image URL *</label>
-      <input type="url" id="poster_url" required placeholder="https://image.tmdb.org/t/p/w500/...">
-
-      <!-- Movie Link Section -->
-      <div id="movie-link-section">
-        <label>Telegram Stream/Download Link *</label>
-        <input type="url" id="telegram_link" placeholder="https://t.me/c/...">
-      </div>
-
-      <!-- Series Episodes Section -->
-      <div id="series-episodes-section">
-        <label style="color: #f59e0b; margin-top: 0;">📺 Series Episodes List</label>
-        <div id="episodes-container"></div>
-        <button type="button" onclick="addEpisodeRow()" class="btn-add-ep">+ Add Episode</button>
-      </div>
-
-      <label>Description / Storyline</label>
-      <textarea id="description" rows="3" placeholder="Enter movie description..."></textarea>
-
-      <button type="submit" id="btn-submit">Save Movie</button>
-      <button type="button" id="btn-cancel" class="btn-cancel" style="display:none;" onclick="resetForm()">Cancel Edit</button>
-    </form>
-  </div>
-
-  <div class="card">
-    <h2>📋 Items List (<span id="total-count">0</span>)</h2>
-    <div style="overflow-x: auto;">
+    <!-- Movie Table -->
+    <div class="movie-table-card">
       <table>
         <thead>
           <tr>
             <th>Poster</th>
             <th>Title</th>
             <th>Type</th>
-            <th>Rating</th>
+            <th>Category</th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="movie-list">
-          <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
+        <tbody id="movie-table-body">
+          <!-- Data တွေ JavaScript နဲ့ ရောက်လာပါမယ် -->
         </tbody>
       </table>
     </div>
@@ -129,177 +122,77 @@
     const SUPABASE_KEY = 'sb_publishable_9nHwP9SRRzgpxxslQ-gB6w_hT2Y-noa';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let moviesList = [];
+    let allAdminMovies = [];
 
-    // Setup Type Change Event Listener
-    document.addEventListener('DOMContentLoaded', () => {
-      const typeSelect = document.getElementById('type');
-      typeSelect.addEventListener('change', handleTypeChange);
-      fetchMovies();
-    });
+    document.addEventListener('DOMContentLoaded', loadAdminMovies);
 
-    function handleTypeChange() {
-      const selectedType = document.getElementById('type').value;
-      const movieSec = document.getElementById('movie-link-section');
-      const seriesSec = document.getElementById('series-episodes-section');
-      const epContainer = document.getElementById('episodes-container');
-
-      if (selectedType === 'Series') {
-        movieSec.style.display = 'none';
-        seriesSec.style.display = 'block';
-
-        if (epContainer.children.length === 0) {
-          addEpisodeRow('S1 E01', '');
-        }
-      } else {
-        movieSec.style.display = 'block';
-        seriesSec.style.display = 'none';
-      }
-    }
-
-    function addEpisodeRow(name = '', link = '') {
-      const container = document.getElementById('episodes-container');
-      const div = document.createElement('div');
-      div.className = 'ep-row';
-      div.innerHTML = `
-        <input type="text" placeholder="Ep Name (e.g. S1 E01)" value="${name}" style="width: 35%;" class="ep-name">
-        <input type="url" placeholder="Telegram Link" value="${link}" style="width: 55%;" class="ep-link">
-        <button type="button" class="btn-remove-ep" onclick="this.parentElement.remove()">✕</button>
-      `;
-      container.appendChild(div);
-    }
-
-    function getEpisodesData() {
-      const rows = document.querySelectorAll('.ep-row');
-      const list = [];
-      rows.forEach(r => {
-        const name = r.querySelector('.ep-name').value.trim();
-        const link = r.querySelector('.ep-link').value.trim();
-        if (name && link) list.push({ title: name, link: link });
-      });
-      return list;
-    }
-
-    function showMsg(text, isError = false) {
-      const msg = document.getElementById('msg');
-      msg.innerText = text;
-      msg.className = isError ? 'error' : 'success';
-      msg.style.display = 'block';
-      setTimeout(() => { msg.style.display = 'none'; }, 3000);
-    }
-
-    async function fetchMovies() {
+    // Supabase ထဲမှ ရုပ်ရှင်များ ဆွဲယူခြင်း
+    async function loadAdminMovies() {
       const { data, error } = await sb.from('movies').select('*').order('id', { ascending: false });
       if (error) {
-        showMsg('Error fetching data: ' + error.message, true);
+        console.error('Error fetching movies:', error.message);
         return;
       }
-      moviesList = data || [];
-      document.getElementById('total-count').innerText = moviesList.length;
-      renderTable();
+      allAdminMovies = data || [];
+      renderAdminTable(allAdminMovies);
     }
 
-    function renderTable() {
-      const tbody = document.getElementById('movie-list');
-      tbody.innerHTML = '';
-      if (moviesList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No items found.</td></tr>';
+    // Table ထဲ Render လုပ်ပေးသည့် Function
+    function renderAdminTable(movies) {
+      const tbody = document.getElementById('movie-table-body');
+      
+      if (movies.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-sub);">ရုပ်ရှင် ရှာမတွေ့ပါ။</td></tr>`;
         return;
       }
 
-      moviesList.forEach(m => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><img src="${m.poster_url || ''}" class="poster-preview" onerror="this.src='https://via.placeholder.com/40x55'"></td>
-          <td><strong>${m.title}</strong><br><small style="color:#94a3b8">${m.category || ''}</small></td>
-          <td>${m.type || 'Movie'}</td>
-          <td>⭐ ${m.rating || 'N/A'}</td>
-          <td>
-            <button class="action-btn btn-edit" onclick="editMovie(${m.id})">Edit</button>
-            <button class="action-btn btn-delete" onclick="deleteMovie(${m.id})">Delete</button>
+      tbody.innerHTML = movies.map(m => `
+        <tr>
+          <td class="poster-td">
+            <img src="${m.poster_url}" onerror="this.src='https://via.placeholder.com/40x56'">
           </td>
-        `;
-        tbody.appendChild(tr);
+          <td style="font-weight: 600; color: #fff;">${m.title}</td>
+          <td><span style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius:4px; font-size:11px;">${m.type || 'Movie'}</span></td>
+          <td style="color: var(--text-sub);">${m.category || 'General'}</td>
+          <td>
+            <button class="btn-action btn-edit" onclick="handleEdit(${m.id})"><i class="fa-solid fa-pen"></i> Edit</button>
+            <button class="btn-action btn-delete" onclick="handleDelete(${m.id})"><i class="fa-solid fa-trash"></i> Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Search Box မှ စာရိုက်တိုင်း Filter လုပ်ပေးသည့် Function
+    function filterAdminMovies() {
+      const query = document.getElementById('admin-search-input').value.toLowerCase().trim();
+      
+      const filtered = allAdminMovies.filter(m => {
+        const titleMatch = m.title && m.title.toLowerCase().includes(query);
+        const catMatch = m.category && m.category.toLowerCase().includes(query);
+        const typeMatch = m.type && m.type.toLowerCase().includes(query);
+        return titleMatch || catMatch || typeMatch;
       });
+
+      renderAdminTable(filtered);
     }
 
-    document.getElementById('movie-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('movie-id').value;
-      const type = document.getElementById('type').value;
-
-      const payload = {
-        title: document.getElementById('title').value,
-        type: type,
-        category: document.getElementById('category').value,
-        quality: document.getElementById('quality').value,
-        rating: document.getElementById('rating').value,
-        poster_url: document.getElementById('poster_url').value,
-        telegram_link: type === 'Movie' ? document.getElementById('telegram_link').value : null,
-        episodes: type === 'Series' ? getEpisodesData() : [],
-        description: document.getElementById('description').value
-      };
-
-      if (id) {
-        const { error } = await sb.from('movies').update(payload).eq('id', id);
-        if (error) showMsg('Update Error: ' + error.message, true);
-        else showMsg('Updated successfully!');
-      } else {
-        const { error } = await sb.from('movies').insert([payload]);
-        if (error) showMsg('Insert Error: ' + error.message, true);
-        else showMsg('Saved successfully!');
-      }
-
-      resetForm();
-      fetchMovies();
-    });
-
-    function editMovie(id) {
-      const m = moviesList.find(item => item.id === id);
-      if (!m) return;
-      document.getElementById('movie-id').value = m.id;
-      document.getElementById('title').value = m.title || '';
-      document.getElementById('type').value = m.type || 'Movie';
-      document.getElementById('category').value = m.category || '';
-      document.getElementById('quality').value = m.quality || '1080p';
-      document.getElementById('rating').value = m.rating || '8.0';
-      document.getElementById('poster_url').value = m.poster_url || '';
-      document.getElementById('telegram_link').value = m.telegram_link || '';
-      document.getElementById('description').value = m.description || '';
-
-      const container = document.getElementById('episodes-container');
-      container.innerHTML = '';
-      if (m.type === 'Series' && m.episodes && m.episodes.length > 0) {
-        m.episodes.forEach(ep => addEpisodeRow(ep.title, ep.link));
-      }
-
-      handleTypeChange();
-
-      document.getElementById('form-title').innerText = '✏️ Edit Item ID: ' + m.id;
-      document.getElementById('btn-submit').innerText = 'Update Item';
-      document.getElementById('btn-cancel').style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Edit Function
+    function handleEdit(id) {
+      const movie = allAdminMovies.find(m => m.id === id);
+      alert(`Edit လုပ်မည်: ${movie.title}\n(သင့် Admin Form ထဲသို့ Data များ ထည့်သွင်းပေးနိုင်ပါသည်)`);
     }
 
-    async function deleteMovie(id) {
-      if (!confirm('Are you sure you want to delete this item?')) return;
-      const { error } = await sb.from('movies').delete().eq('id', id);
-      if (error) showMsg('Delete Error: ' + error.message, true);
-      else {
-        showMsg('Deleted successfully!');
-        fetchMovies();
+    // Delete Function
+    async function handleDelete(id) {
+      if (confirm('ဒီရုပ်ရှင်ကို ဖျက်ရန် သေချာပါသလား?')) {
+        const { error } = await sb.from('movies').delete().eq('id', id);
+        if (error) {
+          alert('Delete လုပ်ရတာ မအောင်မြင်ပါ: ' + error.message);
+        } else {
+          alert('ဖျက်ပြီးပါပြီ!');
+          loadAdminMovies(); // Table ပြန် Refresh လုပ်မည်
+        }
       }
-    }
-
-    function resetForm() {
-      document.getElementById('movie-form').reset();
-      document.getElementById('movie-id').value = '';
-      document.getElementById('episodes-container').innerHTML = '';
-      document.getElementById('type').value = 'Movie';
-      handleTypeChange();
-      document.getElementById('form-title').innerText = '➕ Add New Movie/Series';
-      document.getElementById('btn-submit').innerText = 'Save Movie';
-      document.getElementById('btn-cancel').style.display = 'none';
     }
   </script>
 </body>
