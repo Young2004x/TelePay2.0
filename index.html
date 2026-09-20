@@ -24,58 +24,90 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 75px; }
 
-    /* Header */
-    header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: rgba(11, 13, 16, 0.9); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--glass-border); }
-    .logo { font-size: 20px; font-weight: 900; color: var(--accent-red); text-decoration: none; cursor: pointer; letter-spacing: 0.5px; }
-    .search-box { position: relative; width: 55%; max-width: 250px; }
-    .search-box input { width: 100%; padding: 8px 12px 8px 34px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--glass-border); border-radius: 20px; color: #fff; font-size: 13px; outline: none; }
-    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 12px; }
+    /* Header Design */
+    header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 14px 24px; 
+      background: rgba(11, 13, 16, 0.95); 
+      backdrop-filter: blur(12px); 
+      position: sticky; 
+      top: 0; 
+      z-index: 100; 
+      border-bottom: 1px solid var(--glass-border); 
+    }
+    .header-inner {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo { font-size: 22px; font-weight: 900; color: var(--accent-red); text-decoration: none; cursor: pointer; letter-spacing: 0.5px; }
+    .search-box { position: relative; width: 60%; max-width: 320px; }
+    .search-box input { width: 100%; padding: 10px 14px 10px 38px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--glass-border); border-radius: 20px; color: #fff; font-size: 13px; outline: none; transition: 0.2s; }
+    .search-box input:focus { border-color: var(--accent-red); background: rgba(255, 255, 255, 0.1); }
+    .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 13px; }
 
-    /* Main Container */
-    .container { padding: 16px 12px; max-width: 800px; margin: 0 auto; }
+    /* Main Container Widened for Desktop */
+    .container { 
+      padding: 20px 24px; 
+      max-width: 1400px; /* Desktop အတွက် ဘေးအကွာအဝေး ပိုကျယ်ပေးထားပါသည် */
+      margin: 0 auto; 
+    }
 
     /* Categories Bar */
-    .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
+    .categories-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; scrollbar-width: none; }
     .categories-bar::-webkit-scrollbar { display: none; }
-    .cat-pill { padding: 6px 16px; background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 20px; font-size: 12px; color: var(--text-sub); cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .cat-pill { padding: 8px 20px; background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 20px; font-size: 13px; color: var(--text-sub); cursor: pointer; white-space: nowrap; transition: 0.2s; }
     .cat-pill.active, .cat-pill:hover { background: var(--accent-red); color: #fff; font-weight: bold; border-color: var(--accent-red); }
 
     /* Section Headers */
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 10px 0; }
-    .section-title-wrap { display: flex; align-items: center; gap: 8px; }
-    .section-title { font-size: 15px; font-weight: 700; color: #fff; }
-    .section-count { font-size: 11px; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); padding: 2px 7px; border-radius: 10px; font-weight: bold; }
-    .view-all { font-size: 12px; color: var(--accent-red); text-decoration: none; cursor: pointer; font-weight: 600; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 12px 0; }
+    .section-title-wrap { display: flex; align-items: center; gap: 10px; }
+    .section-title { font-size: 18px; font-weight: 700; color: #fff; }
+    .section-count { font-size: 11px; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+    .view-all { font-size: 13px; color: var(--accent-red); text-decoration: none; cursor: pointer; font-weight: 600; }
 
-    /* Section Grid: 3 Columns, 2 Rows (6 posters) */
-    .section-grid {
+    /* Responsive Grid System (Mobile: 3, Tablet: 5, Desktop: 6-7) */
+    .section-grid, .movie-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    @media (min-width: 600px) {
+      .section-grid, .movie-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    }
+    @media (min-width: 900px) {
+      .section-grid, .movie-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; }
+    }
+    @media (min-width: 1200px) {
+      .section-grid, .movie-grid { grid-template-columns: repeat(7, 1fr); gap: 18px; } /* Desktop မျက်နှာပြင်ကျယ်တွင် ၇ ကော်လံအထိ ပြပေးမည် */
     }
 
     /* Movie Cards */
-    .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--glass-border); transition: transform 0.2s; }
-    .movie-card:hover { transform: translateY(-3px); }
+    .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--glass-border); transition: transform 0.25s, border-color 0.25s; }
+    .movie-card:hover { transform: translateY(-5px); border-color: rgba(239, 68, 68, 0.4); }
     .poster-wrapper { position: relative; aspect-ratio: 2/3; width: 100%; background: #1a1d24; }
     .poster-wrapper img { width: 100%; height: 100%; object-fit: cover; }
     
-    /* Quality Badge Design */
-    .badge-quality { position: absolute; top: 4px; left: 4px; background: rgba(239, 68, 68, 0.9); padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 0.3px; }
-    .badge-rating { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px; font-size: 9px; color: var(--accent-gold); }
+    /* Quality & Rating Badges */
+    .badge-quality { position: absolute; top: 6px; left: 6px; background: rgba(239, 68, 68, 0.9); padding: 3px 7px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #ffffff; text-transform: uppercase; }
+    .badge-rating { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); padding: 3px 7px; border-radius: 4px; font-size: 10px; color: var(--accent-gold); font-weight: 600; }
     
-    .movie-info { padding: 8px; }
-    .movie-title { font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .movie-meta { font-size: 10px; color: var(--text-sub); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .movie-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+    .movie-info { padding: 10px; }
+    .movie-title { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .movie-meta { font-size: 11px; color: var(--text-sub); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* FOOTER DESIGN */
     .app-footer {
       text-align: center;
-      padding: 30px 10px 20px 10px;
-      margin-top: 20px;
+      padding: 40px 10px 20px 10px;
+      margin-top: 30px;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       color: var(--text-sub);
     }
@@ -84,10 +116,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
       font-size: 13px;
       font-weight: 500;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     .footer-version {
@@ -99,39 +131,13 @@
       color: #a1a1aa;
     }
 
-    .footer-credit-title {
-      font-size: 12px;
-      color: #8E8E93;
-      margin-bottom: 6px;
-    }
+    .footer-credit-title { font-size: 12px; color: #8E8E93; margin-bottom: 6px; }
+    .footer-credit-teams { font-size: 13px; font-weight: 700; color: #E5E5EA; margin-bottom: 18px; letter-spacing: 0.5px; }
+    .footer-made { font-size: 13px; color: #E5E5EA; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .footer-made i { color: #ef4444; }
 
-    .footer-credit-teams {
-      font-size: 13px;
-      font-weight: 700;
-      color: #E5E5EA;
-      margin-bottom: 18px;
-      letter-spacing: 0.5px;
-    }
-
-    .footer-made {
-      font-size: 13px;
-      color: #E5E5EA;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .footer-made i {
-      color: #ef4444;
-    }
-
-    /* DETAIL VIEW */
-    #detail-page {
-      display: none;
-      min-height: 100vh;
-      animation: fadeIn 0.25s ease-in-out;
-    }
+    /* DETAIL VIEW DESIGN */
+    #detail-page { display: none; min-height: 100vh; animation: fadeIn 0.25s ease-in-out; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
@@ -140,33 +146,31 @@
 
     .detail-top-bar { display: flex; align-items: center; margin-bottom: 16px; }
     .btn-back { display: inline-flex; align-items: center; gap: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--card-bg); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border); }
-    .detail-card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .detail-banner-wrapper { position: relative; width: 100%; height: 230px; overflow: hidden; }
-    .detail-banner-bg { width: 100%; height: 100%; object-fit: cover; filter: blur(16px) brightness(0.35); transform: scale(1.2); }
+    .detail-card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 1000px; margin: 0 auto; }
+    .detail-banner-wrapper { position: relative; width: 100%; height: 280px; overflow: hidden; }
+    .detail-banner-bg { width: 100%; height: 100%; object-fit: cover; filter: blur(20px) brightness(0.35); transform: scale(1.2); }
     .detail-poster-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(to bottom, rgba(11,13,16,0.1), var(--bg-color)); }
-    .detail-poster-img { height: 175px; aspect-ratio: 2/3; border-radius: 10px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); }
-    .detail-content { padding: 16px; }
-    .detail-title { font-size: 20px; font-weight: 800; color: #fff; text-align: center; margin-bottom: 12px; }
-    .detail-tags { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
-    .tag-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 4px 12px; border-radius: 12px; font-size: 11px; color: var(--text-sub); }
+    .detail-poster-img { height: 210px; aspect-ratio: 2/3; border-radius: 10px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); }
+    .detail-content { padding: 24px; }
+    .detail-title { font-size: 24px; font-weight: 800; color: #fff; text-align: center; margin-bottom: 12px; }
+    .detail-tags { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .tag-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 5px 14px; border-radius: 12px; font-size: 12px; color: var(--text-sub); }
     .tag-badge.gold { color: var(--accent-gold); font-weight: bold; }
-    .detail-description { font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px; text-align: justify; }
-    .watch-section { background: rgba(0, 0, 0, 0.25); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px; }
-    .watch-section-title { font-size: 11px; font-weight: bold; color: var(--accent-red); text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-    .btn-telegram { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: var(--telegram-blue); color: #fff; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; transition: opacity 0.2s; }
+    .detail-description { font-size: 14px; color: #cbd5e1; line-height: 1.7; margin-bottom: 24px; text-align: justify; max-width: 800px; margin-left: auto; margin-right: auto; }
+    .watch-section { background: rgba(0, 0, 0, 0.25); border: 1px solid var(--glass-border); border-radius: 12px; padding: 18px; max-width: 800px; margin: 0 auto; }
+    .watch-section-title { font-size: 12px; font-weight: bold; color: var(--accent-red); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .btn-telegram { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: var(--telegram-blue); color: #fff; padding: 14px; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; transition: opacity 0.2s; }
     .btn-telegram:hover { opacity: 0.9; }
-    .ep-list { display: flex; flex-direction: column; gap: 8px; }
-    .ep-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 10px 12px; border-radius: 6px; color: #fff; text-decoration: none; font-size: 12px; }
+    .ep-list { display: flex; flex-direction: column; gap: 10px; }
+    .ep-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 12px 16px; border-radius: 8px; color: #fff; text-decoration: none; font-size: 13px; }
 
-    /* Bottom Nav */
-    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(11, 13, 16, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; font-size: 10px; gap: 3px; cursor: pointer; }
+    /* Bottom Nav (Mobile Only) */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(11, 13, 16, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; font-size: 10px; gap: 4px; cursor: pointer; }
     .nav-item.active, .nav-item:hover { color: var(--accent-red); }
-    .nav-item i { font-size: 15px; }
+    .nav-item i { font-size: 16px; }
 
     @media (min-width: 768px) {
-      .section-grid { grid-template-columns: repeat(6, 1fr); }
-      .movie-grid { grid-template-columns: repeat(6, 1fr); }
       .bottom-nav { display: none; }
       body { padding-bottom: 0; }
     }
@@ -176,10 +180,12 @@
 
   <!-- Top Navigation Header -->
   <header>
-    <a class="logo" onclick="navigateToHome()">TELEPLAY</a>
-    <div class="search-box">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="search-input" placeholder="Movie ရှာမည်..." onkeyup="handleSearch()">
+    <div class="header-inner">
+      <a class="logo" onclick="navigateToHome()">TELEPLAY</a>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="search-input" placeholder="Movie / Series ရှာမည်..." onkeyup="handleSearch()">
+      </div>
     </div>
   </header>
 
@@ -229,7 +235,7 @@
 
       <div id="view-all-page" style="display: none;">
         <div class="section-header">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
             <span class="view-all" onclick="navigateToHome()"><i class="fa-solid fa-arrow-left"></i> Back</span>
             <span class="section-title" id="view-all-title">All Items</span>
           </div>
@@ -337,7 +343,6 @@
     }
 
     function createCardHTML(m) {
-      // Supabase မှာ quality သီးသန့်မရှိရင် Default '1080p' လို့ ပြပေးမယ်
       const displayQuality = m.quality || '1080p';
 
       return `
@@ -356,9 +361,12 @@
     }
 
     function renderHomeSections(list) {
-      const latestList = list.slice(0, 6);
-      const moviesList = list.filter(m => m.type === 'Movie' || !m.type).slice(0, 6);
-      const seriesList = list.filter(m => m.type === 'Series').slice(0, 6);
+      // Desktop ပေါ်မှာ Poster အပြည့် ပိုကြည့်ကောင်းစေရန် Limit ကို ၁၄ ခုထိ မြှင့်ထားပေးပါသည်
+      const limit = window.innerWidth >= 1200 ? 14 : 6;
+
+      const latestList = list.slice(0, limit);
+      const moviesList = list.filter(m => m.type === 'Movie' || !m.type).slice(0, limit);
+      const seriesList = list.filter(m => m.type === 'Series').slice(0, limit);
 
       document.getElementById('count-latest').innerText = list.length;
       document.getElementById('count-movies').innerText = list.filter(m => m.type === 'Movie' || !m.type).length;
@@ -396,7 +404,7 @@
         m.episodes.forEach(ep => {
           epHTML += `
             <a href="${ep.link}" target="_blank" class="ep-item">
-              <span><i class="fa-solid fa-circle-play" style="margin-right:6px; color:var(--telegram-blue);"></i> ${ep.title}</span>
+              <span><i class="fa-solid fa-circle-play" style="margin-right:8px; color:var(--telegram-blue);"></i> ${ep.title}</span>
               <i class="fa-solid fa-paper-plane" style="color:var(--telegram-blue);"></i>
             </a>
           `;
