@@ -207,7 +207,7 @@
       </div>
 
       <div id="main-sections">
-        <!-- 🔥 Trending Now Section (အရေအတွက် ဖျောက်ထားပြီး စာသား အဖြူရောင် ပြောင်းထားသည်) -->
+        <!-- 🔥 Trending Now Section -->
         <div class="section-header">
           <div class="section-title-wrap">
             <span class="section-title" style="color: #ffffff;"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Trending Now</span>
@@ -332,6 +332,13 @@
 
     document.addEventListener('DOMContentLoaded', fetchMovies);
 
+    // Screen resize လုပ်ရင် (Desktop <-> Mobile) Poster အရေအတွက် လိုက်ပြောင်းပေးရန်
+    window.addEventListener('resize', () => {
+      if (rawMovies.length > 0) {
+        renderHomeSections(rawMovies);
+      }
+    });
+
     window.onpopstate = function(event) {
       if (event.state && event.state.page === 'detail') {
         renderDetailPage(event.state.id);
@@ -375,10 +382,13 @@
     }
 
     function renderHomeSections(list) {
+      // Desktop (>= 1200px) ဆိုရင် Trending Now အတွက် ၇ ခု၊ Mobile/Tablet (< 1200px) ဆိုရင် ၆ ခု ပြသမည်
+      const trendingLimit = window.innerWidth >= 1200 ? 7 : 6;
       const limit = window.innerWidth >= 1200 ? 14 : 6;
 
-      // Trending Now အပိုင်းအတွက် Poster ၇ ခု စီပေးထားပါသည်
-      const trendingList = [...list].sort((a, b) => (b.views || b.rating || 0) - (a.views || a.rating || 0)).slice(0, 7);
+      const trendingList = [...list]
+        .sort((a, b) => (b.views || b.rating || 0) - (a.views || a.rating || 0))
+        .slice(0, trendingLimit);
 
       const latestList = list.slice(0, limit);
       const moviesList = list.filter(m => m.type === 'Movie' || !m.type).slice(0, limit);
