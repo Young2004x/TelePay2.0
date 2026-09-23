@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TelePlay - Admin Panel</title>
+  <title>TelePlay - Admin Panel Login</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -19,111 +19,69 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg-color); color: var(--text-main); padding: 20px; }
-    .admin-container { max-width: 900px; margin: 0 auto; }
-    
-    h1 { font-size: 22px; margin-bottom: 20px; color: var(--accent-red); display: flex; align-items: center; gap: 10px; }
-    h2 { font-size: 16px; margin-bottom: 12px; color: #fff; }
+    body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; }
 
-    /* Form Design */
-    .form-card {
+    /* 🔒 Fullscreen Login Box Overlay */
+    #login-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-color);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    .login-card {
       background: var(--card-bg);
       border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 30px;
+      padding: 30px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+    .login-card h2 { color: var(--accent-red); margin-bottom: 20px; font-size: 20px; font-weight: bold; }
+    .login-input-group { margin-bottom: 14px; text-align: left; }
+    .login-input-group label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 6px; }
+    .login-input-group input {
+      width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border); border-radius: 8px; color: #fff; font-size: 14px; outline: none;
     }
+    .login-input-group input:focus { border-color: var(--accent-red); }
+    .btn-login-submit {
+      width: 100%; padding: 12px; background: var(--accent-red); color: #fff;
+      border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 10px;
+    }
+    .btn-login-submit:hover { opacity: 0.9; }
+
+    /* 🛠️ Admin Panel UI (Login ဝင်ပြီးမှ ပေါ်မည်) */
+    .admin-container { max-width: 900px; margin: 0 auto; padding: 20px; display: none; }
+    h1 { font-size: 22px; margin-bottom: 20px; color: var(--accent-red); display: flex; align-items: center; justify-content: space-between; }
+    h2 { font-size: 16px; margin-bottom: 12px; color: #fff; }
+
+    /* Form & Table Design */
+    .form-card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; margin-bottom: 30px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group.full { grid-column: 1 / -1; }
     label { font-size: 12px; color: var(--text-sub); }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 13px;
-      outline: none;
-    }
+    input, select, textarea { width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--glass-border); border-radius: 8px; color: #fff; font-size: 13px; outline: none; }
     input:focus, select:focus, textarea:focus { border-color: var(--accent-red); }
     textarea { resize: vertical; min-height: 70px; }
     
-    /* Episode Manager Box (Series Only) */
-    .episodes-box {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px dashed rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      padding: 16px;
-      margin-top: 10px;
-    }
-    .ep-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-      align-items: center;
-    }
+    .episodes-box { background: rgba(0, 0, 0, 0.3); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 10px; padding: 16px; margin-top: 10px; }
+    .ep-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
     .ep-row input { flex: 1; }
-    .btn-remove-ep {
-      background: rgba(239, 68, 68, 0.2);
-      color: var(--accent-red);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 10px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .btn-add-ep {
-      background: rgba(59, 130, 246, 0.2);
-      color: var(--accent-blue);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .btn-remove-ep { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+    .btn-add-ep { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
 
-    /* Buttons */
-    .btn-submit {
-      background: var(--accent-red);
-      color: #fff;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: 0.2s;
-    }
-    .btn-submit:hover { opacity: 0.9; }
-    .btn-cancel {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      margin-top: 10px;
-      display: none;
-    }
+    .btn-submit { background: var(--accent-red); color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .btn-cancel { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 14px; cursor: pointer; margin-top: 10px; display: none; }
+    .btn-logout { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--glass-border); padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
 
-    /* Search Box Design */
     .admin-search-wrapper { position: relative; margin-bottom: 16px; }
     .admin-search-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 14px; }
     .admin-search-input { width: 100%; padding: 12px 14px 12px 40px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--glass-border); border-radius: 10px; color: #fff; font-size: 14px; outline: none; }
-    .admin-search-input:focus { border-color: var(--accent-red); }
 
-    /* Movie Table Design */
     .movie-table-card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 12px; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th, td { padding: 12px 16px; border-bottom: 1px solid var(--glass-border); font-size: 13px; }
@@ -142,26 +100,46 @@
 </head>
 <body>
 
-  <div class="admin-container">
-    <h1><i class="fa-solid fa-clapperboard"></i> TelePlay Admin Dashboard</h1>
+  <!-- 🔒 Login Box Overlay -->
+  <div id="login-overlay">
+    <div class="login-card">
+      <h2><i class="fa-solid fa-lock"></i> Admin Login</h2>
+      <form onsubmit="handleLogin(event)">
+        <div class="login-input-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="admin@example.com" required>
+        </div>
+        <div class="login-input-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-login-submit" id="btn-login">Login Access</button>
+      </form>
+      <p id="login-error" style="color: var(--accent-red); font-size: 12px; margin-top: 12px; display: none;"></p>
+    </div>
+  </div>
 
-    <!-- Add / Edit Form -->
+  <!-- 🛠️ Admin Dashboard UI -->
+  <div class="admin-container" id="admin-main">
+    <h1>
+      <span><i class="fa-solid fa-clapperboard"></i> TelePlay Admin Dashboard</span>
+      <button class="btn-logout" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </h1>
+
+    <!-- Form & Content List Code -->
     <div class="form-card">
       <h2 id="form-title">➕ Add New Content</h2>
       <form id="movie-form" onsubmit="handleFormSubmit(event)">
         <input type="hidden" id="movie-id">
-        
         <div class="form-grid">
           <div class="form-group full">
             <label>Title</label>
             <input type="text" id="title" placeholder="ဥပမာ - Flex X Cop" required>
           </div>
-
           <div class="form-group">
-            <label>Release Year (ထွက်ရှိသည့် ခုနှစ်)</label>
+            <label>Release Year</label>
             <input type="text" id="year" placeholder="ဥပမာ - 2026">
           </div>
-
           <div class="form-group">
             <label>Type</label>
             <select id="type" onchange="toggleTypeFields()">
@@ -169,7 +147,6 @@
               <option value="Series">Series</option>
             </select>
           </div>
-
           <div class="form-group">
             <label>Quality Badge</label>
             <select id="quality">
@@ -180,45 +157,34 @@
               <option value="HD">HD</option>
             </select>
           </div>
-
           <div class="form-group">
             <label>Rating (⭐)</label>
             <input type="text" id="rating" placeholder="ဥပမာ - 8.5">
           </div>
-
           <div class="form-group full">
             <label>Category / Genre</label>
             <input type="text" id="category" placeholder="ဥပမာ - Action, Comedy">
           </div>
-
           <div class="form-group full">
             <label>Poster Image URL</label>
             <input type="url" id="poster_url" placeholder="https://..." required>
           </div>
-
-          <!-- Telegram Link (For Movie Only) -->
           <div class="form-group full" id="movie-link-group">
             <label>Telegram Watch Link (For Movie)</label>
             <input type="url" id="telegram_link" placeholder="https://t.me/c/...">
           </div>
-
-          <!-- Episode Manager Panel (For Series Only) -->
           <div class="form-group full" id="series-episodes-group" style="display: none;">
             <label style="color: var(--accent-blue); font-weight: bold;">📺 Series Episodes List</label>
             <div class="episodes-box">
               <div id="episodes-list-container"></div>
-              <button type="button" class="btn-add-ep" onclick="addEpisodeRow()">
-                <i class="fa-solid fa-plus"></i> Add Episode
-              </button>
+              <button type="button" class="btn-add-ep" onclick="addEpisodeRow()"><i class="fa-solid fa-plus"></i> Add Episode</button>
             </div>
           </div>
-
           <div class="form-group full">
             <label>Storyline Description</label>
             <textarea id="description" placeholder="ရုပ်ရှင်/ဇာတ်လမ်းတွဲ အကျဉ်းချုပ်..."></textarea>
           </div>
         </div>
-
         <div style="display: flex; gap: 10px;">
           <button type="submit" class="btn-submit" id="btn-save" style="flex: 1;">Save Content</button>
           <button type="button" class="btn-cancel" id="btn-cancel" onclick="resetForm()">Cancel Edit</button>
@@ -226,20 +192,12 @@
       </form>
     </div>
 
-    <!-- Search Box -->
     <h2><i class="fa-solid fa-list"></i> Content List</h2>
     <div class="admin-search-wrapper">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input 
-        type="text" 
-        id="admin-search-input" 
-        class="admin-search-input" 
-        placeholder="ရုပ်ရှင် အမည် သို့မဟုတ် Category ဖြင့် ရှာရန်..." 
-        onkeyup="filterAdminMovies()"
-      >
+      <input type="text" id="admin-search-input" class="admin-search-input" placeholder="ရုပ်ရှင် အမည် သို့မဟုတ် Category ဖြင့် ရှာရန်..." onkeyup="filterAdminMovies()">
     </div>
 
-    <!-- Movie Management Table -->
     <div class="movie-table-card">
       <table>
         <thead>
@@ -266,40 +224,70 @@
 
     let allAdminMovies = [];
 
-    document.addEventListener('DOMContentLoaded', loadAdminMovies);
+    // Page စပွင့်တာနဲ့ Supabase မှာ Login Session ရှိမရှိ စစ်ပါမယ်
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        showAdminPanel();
+      }
+    });
 
-    // 1. Supabase မှ Data ယူခြင်း
+    // Login Form Submit နှိပ်ရင် Supabase ကို စစ်ဆေးပါမယ်
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const errBox = document.getElementById('login-error');
+      const btnLogin = document.getElementById('btn-login');
+
+      errBox.style.display = 'none';
+      btnLogin.innerText = "Authenticating...";
+
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        errBox.innerText = 'Login မှားယွင်းနေပါသည်: ' + error.message;
+        errBox.style.display = 'block';
+        btnLogin.innerText = "Login Access";
+      } else {
+        showAdminPanel();
+      }
+    }
+
+    // Logout နှိပ်ရင် ထွက်ပါမည်
+    async function handleLogout() {
+      await sb.auth.signOut();
+      document.getElementById('login-overlay').style.display = 'flex';
+      document.getElementById('admin-main').style.display = 'none';
+    }
+
+    function showAdminPanel() {
+      document.getElementById('login-overlay').style.display = 'none';
+      document.getElementById('admin-main').style.display = 'block';
+      loadAdminMovies();
+    }
+
     async function loadAdminMovies() {
       const { data, error } = await sb.from('movies').select('*').order('id', { ascending: false });
-      if (error) {
-        console.error('Error fetching:', error.message);
-        return;
-      }
+      if (error) { console.error('Error fetching:', error.message); return; }
       allAdminMovies = data || [];
       renderAdminTable(allAdminMovies);
     }
 
-    // 2. Table Render
     function renderAdminTable(movies) {
       const tbody = document.getElementById('movie-table-body');
-      
       if (movies.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-sub);">မည်သည့် Data မျှ ရှာမတွေ့ပါ။</td></tr>`;
         return;
       }
-
       tbody.innerHTML = movies.map(m => `
         <tr>
-          <td class="poster-td">
-            <img src="${m.poster_url}" onerror="this.src='https://via.placeholder.com/36x50'">
-          </td>
+          <td class="poster-td"><img src="${m.poster_url}" onerror="this.src='https://via.placeholder.com/36x50'"></td>
           <td style="font-weight: 600; color: #fff;">${m.title}</td>
           <td style="color: var(--accent-red); font-weight: bold;">${m.year || '2026'}</td>
           <td><span style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius:4px; font-size:11px;">${m.type || 'Movie'}</span></td>
           <td style="color: var(--accent-red); font-weight: bold;">${m.quality || '1080p'}</td>
-          <td style="color: #3b82f6; font-weight: bold;">
-            <i class="fa-solid fa-eye" style="font-size: 11px; margin-right: 4px;"></i>${m.views || 0}
-          </td>
+          <td style="color: #3b82f6; font-weight: bold;"><i class="fa-solid fa-eye" style="font-size: 11px; margin-right: 4px;"></i>${m.views || 0}</td>
           <td>
             <button class="btn-action btn-edit" onclick="handleEdit(${m.id})"><i class="fa-solid fa-pen"></i> Edit</button>
             <button class="btn-action btn-delete" onclick="handleDelete(${m.id})"><i class="fa-solid fa-trash"></i> Delete</button>
@@ -308,7 +296,6 @@
       `).join('');
     }
 
-    // 3. Search Box Filter
     function filterAdminMovies() {
       const query = document.getElementById('admin-search-input').value.toLowerCase().trim();
       const filtered = allAdminMovies.filter(m => {
@@ -319,60 +306,46 @@
       renderAdminTable(filtered);
     }
 
-    // 4. Type ပြောင်းသည့်အခါ UI ပြောင်းခြင်း (Movie vs Series)
     function toggleTypeFields() {
       const type = document.getElementById('type').value;
       const movieGroup = document.getElementById('movie-link-group');
       const seriesGroup = document.getElementById('series-episodes-group');
-
       if (type === 'Series') {
         movieGroup.style.display = 'none';
         seriesGroup.style.display = 'block';
-        if (document.querySelectorAll('.ep-row').length === 0) {
-          addEpisodeRow('Episode 1', '');
-        }
+        if (document.querySelectorAll('.ep-row').length === 0) addEpisodeRow('Episode 1', '');
       } else {
         movieGroup.style.display = 'block';
         seriesGroup.style.display = 'none';
       }
     }
 
-    // 5. Dynamic Episode Rows ထည့်ခြင်း/ဖျက်ခြင်း
     function addEpisodeRow(title = '', link = '') {
       const container = document.getElementById('episodes-list-container');
       const epIndex = container.children.length + 1;
       const epTitle = title || `Episode ${epIndex}`;
-
       const row = document.createElement('div');
       row.className = 'ep-row';
       row.innerHTML = `
-        <input type="text" class="ep-title" placeholder="Ep Title (ဥပမာ- S1 Ep 1)" value="${epTitle}">
+        <input type="text" class="ep-title" placeholder="Ep Title" value="${epTitle}">
         <input type="url" class="ep-link" placeholder="Telegram Stream Link" value="${link}">
         <button type="button" class="btn-remove-ep" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
       `;
       container.appendChild(row);
     }
 
-    // 6. Form Submit (Save / Update)
     async function handleFormSubmit(e) {
       e.preventDefault();
-      
       const id = document.getElementById('movie-id').value;
       const type = document.getElementById('type').value;
-
-      // Collect Episode Array for Series
       let episodesArray = [];
       if (type === 'Series') {
-        const epRows = document.querySelectorAll('.ep-row');
-        epRows.forEach(row => {
+        document.querySelectorAll('.ep-row').forEach(row => {
           const epTitle = row.querySelector('.ep-title').value;
           const epLink = row.querySelector('.ep-link').value;
-          if (epTitle && epLink) {
-            episodesArray.push({ title: epTitle, link: epLink });
-          }
+          if (epTitle && epLink) episodesArray.push({ title: epTitle, link: epLink });
         });
       }
-
       const payload = {
         title: document.getElementById('title').value,
         year: document.getElementById('year').value || '2026',
@@ -395,20 +368,13 @@
         error = res.error;
       }
 
-      if (error) {
-        alert('Error: ' + error.message);
-      } else {
-        alert(id ? 'ပြင်ဆင်ပြီးပါပြီ!' : 'အသစ် တင်ပြီးပါပြီ!');
-        resetForm();
-        loadAdminMovies();
-      }
+      if (error) { alert('Error: ' + error.message); }
+      else { alert(id ? 'ပြင်ဆင်ပြီးပါပြီ!' : 'အသစ် တင်ပြီးပါပြီ!'); resetForm(); loadAdminMovies(); }
     }
 
-    // 7. Edit Button နှိပ်လျှင် Data ပြန်ဖြည့်ပေးခြင်း
     function handleEdit(id) {
       const m = allAdminMovies.find(item => item.id === id);
       if (!m) return;
-
       document.getElementById('movie-id').value = m.id;
       document.getElementById('title').value = m.title || '';
       document.getElementById('year').value = m.year || '2026';
@@ -420,35 +386,26 @@
       document.getElementById('telegram_link').value = m.telegram_link || '';
       document.getElementById('description').value = m.description || '';
 
-      // Clear & Populate Episodes if Series
       const epContainer = document.getElementById('episodes-list-container');
       epContainer.innerHTML = '';
       if (m.type === 'Series' && m.episodes && m.episodes.length > 0) {
         m.episodes.forEach(ep => addEpisodeRow(ep.title, ep.link));
       }
-
       toggleTypeFields();
-
       document.getElementById('form-title').innerText = "✏️ Edit Content Details";
       document.getElementById('btn-save').innerText = "Update Content";
       document.getElementById('btn-cancel').style.display = "block";
-      
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 8. Delete Function
     async function handleDelete(id) {
       if (confirm('ဒီ Content ကို ဖျက်ရန် သေချာပါသလား?')) {
         const { error } = await sb.from('movies').delete().eq('id', id);
-        if (error) {
-          alert('Delete မအောင်မြင်ပါ: ' + error.message);
-        } else {
-          loadAdminMovies();
-        }
+        if (error) alert('Delete မအောင်မြင်ပါ: ' + error.message);
+        else loadAdminMovies();
       }
     }
 
-    // 9. Reset Form
     function resetForm() {
       document.getElementById('movie-form').reset();
       document.getElementById('movie-id').value = '';
