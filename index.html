@@ -21,7 +21,6 @@
       --glass-border: rgba(255, 255, 255, 0.08);
       --accent-red: #ef4444;
       --accent-gold: #f59e0b;
-      --accent-blue: #3b82f6; /* Year ခုနှစ်အတွက် အပြာရောင် */
       --telegram-blue: #229ED9;
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
@@ -95,7 +94,7 @@
       .section-grid, .movie-grid { grid-template-columns: repeat(7, 1fr); gap: 18px; }
     }
 
-    /* Movie Cards Design (HomieTV Style) */
+    /* Movie Cards Design */
     .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--glass-border); transition: transform 0.25s, border-color 0.25s; }
     .movie-card:hover { transform: translateY(-5px); border-color: rgba(239, 68, 68, 0.4); }
     .poster-wrapper { position: relative; aspect-ratio: 2/3; width: 100%; background: #1a1d24; }
@@ -108,8 +107,8 @@
     .movie-info { padding: 10px; display: flex; flex-direction: column; gap: 3px; }
     .movie-title { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
-    /* Movie Year Style (HomieTV သိုင်း) */
-    .movie-year { font-size: 12px; font-weight: 600; color: var(--accent-blue); }
+    /* Movie Year Style - အနီရောင်သို့ ပြောင်းထားသည် */
+    .movie-year { font-size: 12px; font-weight: 600; color: var(--accent-red); }
     .movie-meta { font-size: 11px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* FOOTER DESIGN */
@@ -165,7 +164,7 @@
     .detail-tags { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
     .tag-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 5px 14px; border-radius: 12px; font-size: 12px; color: var(--text-sub); }
     .tag-badge.gold { color: var(--accent-gold); font-weight: bold; }
-    .tag-badge.blue { color: var(--accent-blue); font-weight: bold; }
+    .tag-badge.red { color: var(--accent-red); font-weight: bold; }
     .detail-description { font-size: 14px; color: #cbd5e1; line-height: 1.7; margin-bottom: 24px; text-align: justify; max-width: 800px; margin-left: auto; margin-right: auto; }
     .watch-section { background: rgba(0, 0, 0, 0.25); border: 1px solid var(--glass-border); border-radius: 12px; padding: 18px; max-width: 800px; margin: 0 auto; }
     .watch-section-title { font-size: 12px; font-weight: bold; color: var(--accent-red); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
@@ -296,7 +295,7 @@
 
           <div class="detail-tags">
             <span class="tag-badge gold"><i class="fa-solid fa-star"></i> <span id="detail-rating">N/A</span></span>
-            <span class="tag-badge blue" id="detail-year">2026</span>
+            <span class="tag-badge red" id="detail-year">2026</span>
             <span class="tag-badge" id="detail-type">Movie</span>
             <span class="tag-badge" id="detail-genre">Category</span>
           </div>
@@ -368,10 +367,10 @@
       }
     }
 
-    /* CARD HTML - Title, Year, Category ကို သီးသန့် ၃ လိုင်းပြပေးသည့်နေရာ */
+    /* CARD HTML */
     function createCardHTML(m) {
       const displayQuality = m.quality || '1080p';
-      const displayYear = m.year || '2026'; // Year မရှိရင် 2026 အလိုအလျောက် ပြမည်
+      const displayYear = m.year || '2026';
 
       return `
         <div class="movie-card" onclick="openDetailPage(${m.id})">
