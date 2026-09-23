@@ -207,11 +207,10 @@
       </div>
 
       <div id="main-sections">
-        <!-- 🔥 Trending Now Section (Views အများဆုံး ၆ ခု) -->
+        <!-- 🔥 Trending Now Section (အရေအတွက် ဖျောက်ထားပြီး စာသား အဖြူရောင် ပြောင်းထားသည်) -->
         <div class="section-header">
           <div class="section-title-wrap">
-            <span class="section-title" style="color: #f59e0b;"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Trending Now</span>
-            <span class="section-count" id="count-trending">6</span>
+            <span class="section-title" style="color: #ffffff;"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Trending Now</span>
           </div>
           <span class="view-all" onclick="showViewAll('trending')">View All ›</span>
         </div>
@@ -378,14 +377,13 @@
     function renderHomeSections(list) {
       const limit = window.innerWidth >= 1200 ? 14 : 6;
 
-      // Trending movies - Views အများဆုံးအလိုက် စီပေးထားပါသည် (views ကော်လံ မရှိသေးပါက rating ဖြင့် စီပါမည်)
-      const trendingList = [...list].sort((a, b) => (b.views || b.rating || 0) - (a.views || a.rating || 0)).slice(0, 6);
+      // Trending Now အပိုင်းအတွက် Poster ၇ ခု စီပေးထားပါသည်
+      const trendingList = [...list].sort((a, b) => (b.views || b.rating || 0) - (a.views || a.rating || 0)).slice(0, 7);
 
       const latestList = list.slice(0, limit);
       const moviesList = list.filter(m => m.type === 'Movie' || !m.type).slice(0, limit);
       const seriesList = list.filter(m => m.type === 'Series').slice(0, limit);
 
-      document.getElementById('count-trending').innerText = trendingList.length;
       document.getElementById('count-latest').innerText = list.length;
       document.getElementById('count-movies').innerText = list.filter(m => m.type === 'Movie' || !m.type).length;
       document.getElementById('count-series').innerText = list.filter(m => m.type === 'Series').length;
@@ -407,7 +405,7 @@
       const m = rawMovies.find(item => item.id === id);
       if (!m) return;
 
-      // Detail Page ကို ဝင်ကြည့်တိုင်း Supabase ရှိ views အရေအတွက်ကို ၁ တိုးပေးမည်
+      // Detail Page ကြည့်ပါက Views အရေအတွက်ကို ၁ တိုးပေးမည်
       sb.from('movies').update({ views: (m.views || 0) + 1 }).eq('id', id).then();
 
       document.getElementById('home-view').style.display = 'none';
@@ -491,7 +489,7 @@
 
       let list = [];
       if (type === 'trending') {
-        document.getElementById('view-all-title').innerText = '🔥 Trending Now';
+        document.getElementById('view-all-title').innerHTML = '<i class="fa-solid fa-fire" style="color: #ef4444;"></i> <span style="color: #ffffff;">Trending Now</span>';
         list = [...rawMovies].sort((a, b) => (b.views || b.rating || 0) - (a.views || a.rating || 0));
       } else if (type === 'latest') {
         document.getElementById('view-all-title').innerText = 'Latest Updates';
