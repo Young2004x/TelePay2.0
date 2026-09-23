@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Website Favicon (အမြဲ ပေါ်စေမည့် Code) -->
-  <link rel="icon" type="image/jpeg" href="https://boiqvzakfztlujjdiyhm.supabase.co/storage/v1/object/public/assets/Code_Generated_Image.png">
-  <link rel="apple-touch-icon" href="https://boiqvzakfztlujjdiyhm.supabase.co/storage/v1/object/public/assets/Code_Generated_Image.png">
-
-  
-</head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TelePlay - Stream & Watch</title>
+
+  <!-- Website Favicon -->
+  <link rel="icon" type="image/png" href="https://boiqvzakfztlujjdiyhm.supabase.co/storage/v1/object/public/assets/Code_Generated_Image.png">
+  <link rel="apple-touch-icon" href="https://boiqvzakfztlujjdiyhm.supabase.co/storage/v1/object/public/assets/Code_Generated_Image.png">
+
   <!-- Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <!-- FontAwesome Icons -->
@@ -61,10 +56,10 @@
     .search-box input:focus { border-color: var(--accent-red); background: rgba(255, 255, 255, 0.1); }
     .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 13px; }
 
-    /* Main Container Widened for Desktop */
+    /* Main Container */
     .container { 
       padding: 20px 24px; 
-      max-width: 1400px; /* Desktop အတွက် ဘေးအကွာအဝေး ပိုကျယ်ပေးထားပါသည် */
+      max-width: 1400px; 
       margin: 0 auto; 
     }
 
@@ -81,7 +76,7 @@
     .section-count { font-size: 11px; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); padding: 2px 8px; border-radius: 10px; font-weight: bold; }
     .view-all { font-size: 13px; color: var(--accent-red); text-decoration: none; cursor: pointer; font-weight: 600; }
 
-    /* Responsive Grid System (Mobile: 3, Tablet: 5, Desktop: 6-7) */
+    /* Responsive Grid System */
     .section-grid, .movie-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -96,7 +91,7 @@
       .section-grid, .movie-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; }
     }
     @media (min-width: 1200px) {
-      .section-grid, .movie-grid { grid-template-columns: repeat(7, 1fr); gap: 18px; } /* Desktop မျက်နှာပြင်ကျယ်တွင် ၇ ကော်လံအထိ ပြပေးမည် */
+      .section-grid, .movie-grid { grid-template-columns: repeat(7, 1fr); gap: 18px; }
     }
 
     /* Movie Cards */
@@ -212,6 +207,16 @@
       </div>
 
       <div id="main-sections">
+        <!-- 🔥 Trending Now Section (Views အများဆုံး ၆ ခု) -->
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-title" style="color: #f59e0b;"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Trending Now</span>
+            <span class="section-count" id="count-trending">6</span>
+          </div>
+          <span class="view-all" onclick="showViewAll('trending')">View All ›</span>
+        </div>
+        <div class="section-grid" id="container-trending"></div>
+
         <!-- Latest Updates Section -->
         <div class="section-header">
           <div class="section-title-wrap">
@@ -371,17 +376,21 @@
     }
 
     function renderHomeSections(list) {
-      // Desktop ပေါ်မှာ Poster အပြည့် ပိုကြည့်ကောင်းစေရန် Limit ကို ၁၄ ခုထိ မြှင့်ထားပေးပါသည်
       const limit = window.innerWidth >= 1200 ? 14 : 6;
+
+      // Trending movies - Views အများဆုံးအလိုက် စီပေးထားပါသည် (views ကော်လံ မရှိသေးပါက rating ဖြင့် စီပါမည်)
+      const trendingList = [...list].sort((a, b) => (b.views || b.rating || 0) - (a.views || a.rating || 0)).slice(0, 6);
 
       const latestList = list.slice(0, limit);
       const moviesList = list.filter(m => m.type === 'Movie' || !m.type).slice(0, limit);
       const seriesList = list.filter(m => m.type === 'Series').slice(0, limit);
 
+      document.getElementById('count-trending').innerText = trendingList.length;
       document.getElementById('count-latest').innerText = list.length;
       document.getElementById('count-movies').innerText = list.filter(m => m.type === 'Movie' || !m.type).length;
       document.getElementById('count-series').innerText = list.filter(m => m.type === 'Series').length;
 
+      document.getElementById('container-trending').innerHTML = trendingList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px; grid-column:1/-1;">No trending content</div>';
       document.getElementById('container-latest').innerHTML = latestList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px; grid-column:1/-1;">No updates</div>';
       document.getElementById('container-movies').innerHTML = moviesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px; grid-column:1/-1;">No movies</div>';
       document.getElementById('container-series').innerHTML = seriesList.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub); font-size:12px; grid-column:1/-1;">No series</div>';
@@ -394,9 +403,15 @@
       renderDetailPage(id);
     }
 
-    function renderDetailPage(id) {
+    async function renderDetailPage(id) {
       const m = rawMovies.find(item => item.id === id);
       if (!m) return;
+
+      // Detail Page ကို ဝင်ကြည့်တိုင်း Supabase ရှိ views အရေအတွက်ကို ၁ တိုးပေးမည်
+      sb.from('movies').update({ views: (m.views || 0) + 1 }).eq('id', id).then();
+
+      document.getElementById('home-view').style.display = 'none';
+      document.getElementById('detail-page').style.display = 'block';
 
       document.getElementById('detail-bg').src = m.poster_url;
       document.getElementById('detail-img').src = m.poster_url;
@@ -415,66 +430,38 @@
           epHTML += `
             <a href="${ep.link}" target="_blank" class="ep-item">
               <span><i class="fa-solid fa-circle-play" style="margin-right:8px; color:var(--telegram-blue);"></i> ${ep.title}</span>
-              <i class="fa-solid fa-paper-plane" style="color:var(--telegram-blue);"></i>
-            </a>
-          `;
+              <i class="fa-solid fa-chevron-right" style="font-size:12px; opacity:0.6;"></i>
+            </a>`;
         });
         epHTML += `</div>`;
         actionSec.innerHTML = epHTML;
-      } else {
+      } else if (m.telegram_link) {
         actionSec.innerHTML = `
-          <a href="${m.telegram_link || '#'}" target="_blank" class="btn-telegram">
-            <i class="fa-brands fa-telegram" style="font-size:16px;"></i> Watch on Telegram
-          </a>
-        `;
+          <a href="${m.telegram_link}" target="_blank" class="btn-telegram">
+            <i class="fa-paper-plane fa-solid"></i> Watch / Download On Telegram
+          </a>`;
+      } else {
+        actionSec.innerHTML = `<div style="color:var(--text-sub); font-size:13px; text-align:center;">ကြည့်ရှုရန် Link မရှိသေးပါ။</div>`;
       }
 
-      document.getElementById('home-view').style.display = 'none';
-      document.getElementById('detail-page').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderHomePageView() {
+      document.getElementById('detail-page').style.display = 'none';
+      document.getElementById('home-view').style.display = 'block';
+      document.getElementById('main-sections').style.display = 'block';
+      document.getElementById('view-all-page').style.display = 'none';
     }
 
     function navigateToHome() {
       history.pushState({ page: 'home' }, '', window.location.pathname);
       renderHomePageView();
-    }
-
-    function renderHomePageView() {
-      document.getElementById('home-view').style.display = 'block';
-      document.getElementById('main-sections').style.display = 'block';
-      document.getElementById('view-all-page').style.display = 'none';
-      document.getElementById('detail-page').style.display = 'none';
-      document.getElementById('search-input').value = '';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function showViewAll(type) {
-      document.getElementById('home-view').style.display = 'block';
-      document.getElementById('main-sections').style.display = 'none';
-      document.getElementById('view-all-page').style.display = 'block';
-      document.getElementById('detail-page').style.display = 'none';
-
-      let filtered = [];
-      let title = "All Items";
-
-      if (type === 'latest') {
-        filtered = rawMovies;
-        title = "Latest Updates";
-      } else if (type === 'Movie') {
-        filtered = rawMovies.filter(m => m.type === 'Movie' || !m.type);
-        title = "Movies";
-      } else if (type === 'Series') {
-        filtered = rawMovies.filter(m => m.type === 'Series');
-        title = "Series";
-      }
-
-      document.getElementById('view-all-title').innerText = `${title} (${filtered.length})`;
-      document.getElementById('view-all-grid').innerHTML = filtered.map(m => createCardHTML(m)).join('');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderHomeSections(rawMovies);
     }
 
     function filterCategory(cat, el) {
-      document.querySelectorAll('.cat-pill').forEach(pill => pill.classList.remove('active'));
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
       el.classList.add('active');
 
       if (cat === 'All') {
@@ -486,23 +473,37 @@
     }
 
     function handleSearch() {
-      const query = document.getElementById('search-input').value.toLowerCase().trim();
-      if (!query) {
-        renderHomePageView();
+      const q = document.getElementById('search-input').value.toLowerCase().trim();
+      if (!q) {
+        renderHomeSections(rawMovies);
         return;
       }
-      document.getElementById('home-view').style.display = 'block';
+      const filtered = rawMovies.filter(m => 
+        (m.title && m.title.toLowerCase().includes(q)) || 
+        (m.category && m.category.toLowerCase().includes(q))
+      );
+      renderHomeSections(filtered);
+    }
+
+    function showViewAll(type) {
       document.getElementById('main-sections').style.display = 'none';
       document.getElementById('view-all-page').style.display = 'block';
-      document.getElementById('detail-page').style.display = 'none';
-      
-      const filtered = rawMovies.filter(m => m.title.toLowerCase().includes(query));
-      document.getElementById('view-all-title').innerText = `Search Results (${filtered.length})`;
-      document.getElementById('view-all-grid').innerHTML = filtered.map(m => createCardHTML(m)).join('') || '<div style="grid-column: 1/-1; text-align:center; color:var(--text-sub); padding:20px;">No results found.</div>';
+
+      let list = [];
+      if (type === 'trending') {
+        document.getElementById('view-all-title').innerText = '🔥 Trending Now';
+        list = [...rawMovies].sort((a, b) => (b.views || b.rating || 0) - (a.views || a.rating || 0));
+      } else if (type === 'latest') {
+        document.getElementById('view-all-title').innerText = 'Latest Updates';
+        list = rawMovies;
+      } else {
+        document.getElementById('view-all-title').innerText = type + 's';
+        list = rawMovies.filter(m => m.type === type || (!m.type && type === 'Movie'));
+      }
+
+      document.getElementById('view-all-grid').innerHTML = list.map(m => createCardHTML(m)).join('') || '<div style="color:var(--text-sub);">No content found.</div>';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   </script>
-
-  <!-- Vercel Web Analytics Script -->
-  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
