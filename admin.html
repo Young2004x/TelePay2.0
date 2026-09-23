@@ -249,6 +249,7 @@
             <th>Year</th>
             <th>Type</th>
             <th>Quality</th>
+            <th>Views</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -283,7 +284,7 @@
       const tbody = document.getElementById('movie-table-body');
       
       if (movies.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-sub);">မည်သည့် Data မျှ ရှာမတွေ့ပါ။</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-sub);">မည်သည့် Data မျှ ရှာမတွေ့ပါ။</td></tr>`;
         return;
       }
 
@@ -293,9 +294,12 @@
             <img src="${m.poster_url}" onerror="this.src='https://via.placeholder.com/36x50'">
           </td>
           <td style="font-weight: 600; color: #fff;">${m.title}</td>
-          <td style="color: var(--accent-blue); font-weight: bold;">${m.year || '2026'}</td>
+          <td style="color: var(--accent-red); font-weight: bold;">${m.year || '2026'}</td>
           <td><span style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius:4px; font-size:11px;">${m.type || 'Movie'}</span></td>
           <td style="color: var(--accent-red); font-weight: bold;">${m.quality || '1080p'}</td>
+          <td style="color: #3b82f6; font-weight: bold;">
+            <i class="fa-solid fa-eye" style="font-size: 11px; margin-right: 4px;"></i>${m.views || 0}
+          </td>
           <td>
             <button class="btn-action btn-edit" onclick="handleEdit(${m.id})"><i class="fa-solid fa-pen"></i> Edit</button>
             <button class="btn-action btn-delete" onclick="handleDelete(${m.id})"><i class="fa-solid fa-trash"></i> Delete</button>
@@ -371,7 +375,7 @@
 
       const payload = {
         title: document.getElementById('title').value,
-        year: document.getElementById('year').value || '2026', // Release Year
+        year: document.getElementById('year').value || '2026',
         type: type,
         quality: document.getElementById('quality').value,
         rating: document.getElementById('rating').value,
@@ -407,7 +411,7 @@
 
       document.getElementById('movie-id').value = m.id;
       document.getElementById('title').value = m.title || '';
-      document.getElementById('year').value = m.year || '2026'; // Fill year field
+      document.getElementById('year').value = m.year || '2026';
       document.getElementById('type').value = m.type || 'Movie';
       document.getElementById('quality').value = m.quality || '1080p';
       document.getElementById('rating').value = m.rating || '';
