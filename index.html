@@ -21,6 +21,7 @@
       --glass-border: rgba(255, 255, 255, 0.08);
       --accent-red: #ef4444;
       --accent-gold: #f59e0b;
+      --accent-blue: #3b82f6; /* Year ခုနှစ်အတွက် အပြာရောင် */
       --telegram-blue: #229ED9;
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
@@ -94,7 +95,7 @@
       .section-grid, .movie-grid { grid-template-columns: repeat(7, 1fr); gap: 18px; }
     }
 
-    /* Movie Cards */
+    /* Movie Cards Design (HomieTV Style) */
     .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid var(--glass-border); transition: transform 0.25s, border-color 0.25s; }
     .movie-card:hover { transform: translateY(-5px); border-color: rgba(239, 68, 68, 0.4); }
     .poster-wrapper { position: relative; aspect-ratio: 2/3; width: 100%; background: #1a1d24; }
@@ -104,9 +105,12 @@
     .badge-quality { position: absolute; top: 6px; left: 6px; background: rgba(239, 68, 68, 0.9); padding: 3px 7px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #ffffff; text-transform: uppercase; }
     .badge-rating { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); padding: 3px 7px; border-radius: 4px; font-size: 10px; color: var(--accent-gold); font-weight: 600; }
     
-    .movie-info { padding: 10px; }
+    .movie-info { padding: 10px; display: flex; flex-direction: column; gap: 3px; }
     .movie-title { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .movie-meta { font-size: 11px; color: var(--text-sub); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    /* Movie Year Style (HomieTV သိုင်း) */
+    .movie-year { font-size: 12px; font-weight: 600; color: var(--accent-blue); }
+    .movie-meta { font-size: 11px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* FOOTER DESIGN */
     .app-footer {
@@ -158,9 +162,10 @@
     .detail-poster-img { height: 210px; aspect-ratio: 2/3; border-radius: 10px; object-fit: cover; box-shadow: 0 8px 24px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); }
     .detail-content { padding: 24px; }
     .detail-title { font-size: 24px; font-weight: 800; color: #fff; text-align: center; margin-bottom: 12px; }
-    .detail-tags { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .detail-tags { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
     .tag-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); padding: 5px 14px; border-radius: 12px; font-size: 12px; color: var(--text-sub); }
     .tag-badge.gold { color: var(--accent-gold); font-weight: bold; }
+    .tag-badge.blue { color: var(--accent-blue); font-weight: bold; }
     .detail-description { font-size: 14px; color: #cbd5e1; line-height: 1.7; margin-bottom: 24px; text-align: justify; max-width: 800px; margin-left: auto; margin-right: auto; }
     .watch-section { background: rgba(0, 0, 0, 0.25); border: 1px solid var(--glass-border); border-radius: 12px; padding: 18px; max-width: 800px; margin: 0 auto; }
     .watch-section-title { font-size: 12px; font-weight: bold; color: var(--accent-red); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
@@ -170,7 +175,7 @@
     .ep-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 12px 16px; border-radius: 8px; color: #fff; text-decoration: none; font-size: 13px; }
 
     /* Bottom Nav (Mobile Only) */
-    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(11, 13, 16, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(11, 13, 16, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--glass-border); display: flex; justify-space-around; padding: 10px 0; z-index: 100; }
     .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; font-size: 10px; gap: 4px; cursor: pointer; }
     .nav-item.active, .nav-item:hover { color: var(--accent-red); }
     .nav-item i { font-size: 16px; }
@@ -291,6 +296,7 @@
 
           <div class="detail-tags">
             <span class="tag-badge gold"><i class="fa-solid fa-star"></i> <span id="detail-rating">N/A</span></span>
+            <span class="tag-badge blue" id="detail-year">2026</span>
             <span class="tag-badge" id="detail-type">Movie</span>
             <span class="tag-badge" id="detail-genre">Category</span>
           </div>
@@ -332,7 +338,6 @@
 
     document.addEventListener('DOMContentLoaded', fetchMovies);
 
-    // Screen resize လုပ်ရင် (Desktop <-> Mobile) Poster အရေအတွက် လိုက်ပြောင်းပေးရန်
     window.addEventListener('resize', () => {
       if (rawMovies.length > 0) {
         renderHomeSections(rawMovies);
@@ -363,8 +368,10 @@
       }
     }
 
+    /* CARD HTML - Title, Year, Category ကို သီးသန့် ၃ လိုင်းပြပေးသည့်နေရာ */
     function createCardHTML(m) {
       const displayQuality = m.quality || '1080p';
+      const displayYear = m.year || '2026'; // Year မရှိရင် 2026 အလိုအလျောက် ပြမည်
 
       return `
         <div class="movie-card" onclick="openDetailPage(${m.id})">
@@ -375,6 +382,7 @@
           </div>
           <div class="movie-info">
             <div class="movie-title">${m.title}</div>
+            <div class="movie-year">${displayYear}</div>
             <div class="movie-meta">${m.category || 'General'}</div>
           </div>
         </div>
@@ -382,7 +390,6 @@
     }
 
     function renderHomeSections(list) {
-      // Desktop (>= 1200px) ဆိုရင် Trending Now အတွက် ၇ ခု၊ Mobile/Tablet (< 1200px) ဆိုရင် ၆ ခု ပြသမည်
       const trendingLimit = window.innerWidth >= 1200 ? 7 : 6;
       const limit = window.innerWidth >= 1200 ? 14 : 6;
 
@@ -415,7 +422,6 @@
       const m = rawMovies.find(item => item.id === id);
       if (!m) return;
 
-      // Detail Page ကြည့်ပါက Views အရေအတွက်ကို ၁ တိုးပေးမည်
       sb.from('movies').update({ views: (m.views || 0) + 1 }).eq('id', id).then();
 
       document.getElementById('home-view').style.display = 'none';
@@ -425,6 +431,7 @@
       document.getElementById('detail-img').src = m.poster_url;
       document.getElementById('detail-title').innerText = m.title;
       document.getElementById('detail-rating').innerText = m.rating || 'N/A';
+      document.getElementById('detail-year').innerText = m.year || '2026';
       document.getElementById('detail-type').innerText = m.type || 'Movie';
       document.getElementById('detail-genre').innerText = m.category || 'General';
       document.getElementById('detail-desc').innerText = m.description || 'No storyline available.';
