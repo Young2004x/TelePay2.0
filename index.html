@@ -437,8 +437,24 @@
       const trendingLimit = window.innerWidth >= 1200 ? 7 : 6;
       const limit = window.innerWidth >= 1200 ? 14 : 6;
 
-      const trendingList = [...list]
-        .sort((a, b) => (b.views || b.rating || 0) - (a.views || a.rating || 0))
+      // 🔥 နောက်ဆုံး တင်ထားတဲ့ ၇ ရက်အတွင်း ကားများထဲမှ Views အများဆုံး ရွေးထုတ်မည့် Logic
+      const now = new Date();
+      const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+      let recentMovies = list.filter(m => {
+        if (!m.created_at) return true; // created_at မပါရင် Filter မလုပ်ဘဲ ထည့်တွက်ပေးမည်
+        const movieDate = new Date(m.created_at);
+        return (now - movieDate) <= SEVEN_DAYS_MS;
+      });
+
+      // တကယ်လို့ ၁ ပတ်အတွင်း တင်ထားတဲ့ကား နည်းနေရင် Trending ပရိသတ်အတွက် အနည်းဆုံး Limit ပြည့်အောင် နောက်ဆုံးတင်ထားတဲ့ ကားတွေပါ ထပ်ဖြည့်ပေးမည်
+      if (recentMovies.length < trendingLimit) {
+        recentMovies = list.slice(0, Math.max(trendingLimit * 2, 15));
+      }
+
+      // စိစစ်ထားသော လတ်တလောကားများထဲမှ Views အများဆုံး ကားများကို Trending အဖြစ် စီစဉ်ပေးမည်
+      const trendingList = [...recentMovies]
+        .sort((a, b) => (b.views || 0) - (a.views || 0))
         .slice(0, trendingLimit);
 
       const latestList = list.slice(0, limit);
@@ -466,7 +482,10 @@
       const m = rawMovies.find(item => item.id === id);
       if (!m) return;
 
-      sb.from('movies').update({ views: (m.views || 0) + 1 }).eq('id', id).then();
+      // User က Detail Page သို့ ဝင်ရောက်ကြည့်ရှုပါက Views အရေအတွက်ကို Database ထဲမှာ +1 တိုးပေးမည်
+      const updatedViews = (m.views || 0) + 1;
+      m.views = updatedViews; // Local state ထဲမှာပါ ချက်ချင်း update လုပ်ပေးမည်
+      sb.from('movies').update({ views: updatedViews }).eq('id', id).then();
 
       document.getElementById('home-view').style.display = 'none';
       document.getElementById('detail-page').style.display = 'block';
@@ -551,7 +570,7 @@
       let list = [];
       if (type === 'trending') {
         document.getElementById('view-all-title').innerHTML = '<i class="fa-solid fa-fire" style="color: #ef4444;"></i> <span style="color: #ffffff;">Trending Now</span>';
-        list = [...rawMovies].sort((a, b) => (b.views || b.rating || 0) - (a.views || a.rating || 0));
+        list = [...rawMovies].sort((a, b) => (b.views || 0) - (a.views || 0));
       } else if (type === 'latest') {
         document.getElementById('view-all-title').innerText = 'Latest Updates';
         list = rawMovies;
