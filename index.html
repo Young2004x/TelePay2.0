@@ -176,15 +176,80 @@
     .movie-year { font-size: 12px; font-weight: 600; color: var(--accent-red); }
     .movie-meta { font-size: 11px; color: var(--text-sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* FOOTER DESIGN */
+    /* FOOTER DESIGN (Enhanced & Fully Responsive) */
     .app-footer {
       text-align: center;
-      padding: 40px 10px 20px 10px;
-      margin-top: 30px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 45px 16px 25px 16px;
+      margin-top: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
       color: var(--text-sub);
+      background: linear-gradient(180deg, rgba(11, 13, 16, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
     }
 
+    .footer-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Disclaimer Section */
+    .footer-disclaimer {
+      font-size: 12px;
+      line-height: 1.7;
+      color: #94a3b8;
+      text-align: center;
+      padding: 0 10px;
+    }
+    .footer-disclaimer p {
+      margin-bottom: 8px;
+    }
+    .footer-disclaimer .contact-link {
+      color: var(--accent-red);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* Modern Glowing Telegram Button */
+    .btn-footer-telegram {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #0088cc, #229ED9);
+      color: #ffffff;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 18px rgba(34, 158, 217, 0.35);
+      transition: all 0.25s ease-in-out;
+      margin: 6px 0 10px 0;
+    }
+    .btn-footer-telegram:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(34, 158, 217, 0.55);
+      background: linear-gradient(135deg, #229ED9, #0088cc);
+      color: #ffffff;
+    }
+    .btn-footer-telegram i {
+      font-size: 16px;
+    }
+
+    .footer-divider {
+      width: 100%;
+      max-width: 400px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.06);
+      margin: 4px 0;
+    }
+
+    /* Existing Footer Elements */
     .footer-top {
       display: flex;
       align-items: center;
@@ -192,7 +257,8 @@
       gap: 12px;
       font-size: 13px;
       font-weight: 500;
-      margin-bottom: 12px;
+      color: #cbd5e1;
+      flex-wrap: wrap;
     }
 
     .footer-version {
@@ -201,13 +267,27 @@
       padding: 2px 8px;
       border-radius: 6px;
       font-size: 11px;
-      color: #a1a1aa;
+      color: #f59e0b;
+      font-weight: 600;
     }
 
-    .footer-credit-title { font-size: 12px; color: #8E8E93; margin-bottom: 6px; }
-    .footer-credit-teams { font-size: 13px; font-weight: 700; color: #E5E5EA; margin-bottom: 18px; letter-spacing: 0.5px; }
+    .footer-credit-title { font-size: 12px; color: #8E8E93; }
+    .footer-credit-teams { font-size: 13px; font-weight: 700; color: #E5E5EA; letter-spacing: 0.5px; }
     .footer-made { font-size: 13px; color: #E5E5EA; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .footer-made i { color: #ef4444; }
+
+    @media (max-width: 600px) {
+      .footer-disclaimer {
+        font-size: 11px;
+        line-height: 1.6;
+      }
+      .btn-footer-telegram {
+        width: 100%;
+        max-width: 280px;
+        padding: 11px 20px;
+        font-size: 12px;
+      }
+    }
 
     /* DETAIL VIEW DESIGN */
     #detail-page { display: none; min-height: 100vh; animation: fadeIn 0.25s ease-in-out; }
@@ -383,14 +463,32 @@
 
       <!-- FOOTER SECTION -->
       <footer class="app-footer">
-        <div class="footer-top">
-          <span>© 2026 TelePlay</span>
-          <span class="footer-version">v1.0</span>
-          <span>Made By YoungX & Claude Ai</span>
+        <div class="footer-inner">
+          
+          <!-- Legal / Disclaimer Section -->
+          <div class="footer-disclaimer">
+            <p>© 2026 TelePlay. All rights reserved.</p>
+            <p>TelePlay does not host or store any media files on its servers; all contents are indexed from third-party services. All trademarks and copyrights belong to their respective owners. If you wish to request content removal, please <a href="https://t.me/TPadminteam" target="_blank" rel="noopener noreferrer" class="contact-link">contact us</a>.</p>
+          </div>
+
+          <!-- Modern Telegram Channel Button -->
+          <a href="https://t.me/teleplay27" target="_blank" rel="noopener noreferrer" class="btn-footer-telegram">
+            <i class="fa-brands fa-telegram"></i> Join Our Telegram Channel
+          </a>
+
+          <div class="footer-divider"></div>
+
+          <!-- Existing Credits Section with v1.1.0 -->
+          <div class="footer-top">
+            <span>© 2026 TelePlay</span>
+            <span class="footer-version">v1.1.0</span>
+            <span>Made By YoungX & Claude Ai</span>
+          </div>
+          <div class="footer-credit-title">မူရင်း ဘာသာပြန်ပေးသော Team များကို Full Credit ပေးပါတယ်</div>
+          <div class="footer-credit-teams">CM | HomieTV | Bioscope</div>
+          <div class="footer-made">Made With <i class="fa-solid fa-heart"></i> in Myanmar</div>
+
         </div>
-        <div class="footer-credit-title">မူရင်း ဘာသာပြန်ပေးသော Team များကို Full Credit ပေးပါတယ်</div>
-        <div class="footer-credit-teams">CM | HomieTV | Bioscope</div>
-        <div class="footer-made">Made With <i class="fa-solid fa-heart"></i> in Myanmar</div>
       </footer>
     </div>
 
