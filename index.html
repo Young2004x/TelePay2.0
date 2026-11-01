@@ -191,7 +191,22 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
+    }
+
+    /* Footer TELEPLAY Brand Logo (Disclaimer အပေါ်မှာ ပေါ်မည့် Logo) */
+    .footer-logo {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--accent-red);
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: inline-block;
+      margin-bottom: 2px;
+      transition: opacity 0.2s ease;
+    }
+    .footer-logo:hover {
+      opacity: 0.85;
     }
 
     /* Disclaimer Section */
@@ -203,7 +218,7 @@
       padding: 0 10px;
     }
     .footer-disclaimer p {
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .footer-disclaimer .contact-link {
       color: var(--accent-red);
@@ -246,17 +261,6 @@
       height: 1px;
       background: rgba(255, 255, 255, 0.08);
       margin: 6px 0;
-    }
-
-    /* Footer TELEPLAY Brand Logo */
-    .footer-logo {
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--accent-red);
-      letter-spacing: 1px;
-      cursor: pointer;
-      display: inline-block;
-      margin-bottom: 2px;
     }
 
     .footer-top {
@@ -470,10 +474,13 @@
         <div class="movie-grid" id="view-all-grid"></div>
       </div>
 
-      <!-- FOOTER SECTION (Clean Solid Black with TELEPLAY Brand) -->
+      <!-- FOOTER SECTION (Clean Solid Black with TELEPLAY Brand on Top) -->
       <footer class="app-footer">
         <div class="footer-inner">
           
+          <!-- Header စတိုင် အနီရောင် TELEPLAY Logo (နေရာမှန်: Disclaimer အပေါ်ဆုံး) -->
+          <div class="footer-logo" onclick="navigateToHome()">TELEPLAY</div>
+
           <!-- Legal / Disclaimer Section -->
           <div class="footer-disclaimer">
             <p>© 2026 TelePlay. All rights reserved.</p>
@@ -486,9 +493,6 @@
           </a>
 
           <div class="footer-divider"></div>
-
-          <!-- Header စတိုင် အနီရောင် TELEPLAY Logo -->
-          <div class="footer-logo" onclick="navigateToHome()">TELEPLAY</div>
 
           <!-- Credits Section with v1.1.0 -->
           <div class="footer-top">
